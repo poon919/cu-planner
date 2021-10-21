@@ -1,0 +1,1194 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 FINAL//EN">
+
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html;">
+<META NAME="Generator" CONTENT="NetObjects Fusion 4.0 for Windows">
+<TITLE>QueryCourseSchedule</TITLE>
+<script type="text/javascript" src="/cu/cs/script/studyprogram.js"></script>
+<script type="text/javascript">
+var my_timeout = 5000;	// 1 second
+var timerID = window.setTimeout("", my_timeout);
+var curfaculty ="";
+function canSubmit() { return (document.forms[0].activestatus.value == "ON"); }
+function enableSubmit() { document.forms[0].activestatus.value = "ON"; }
+function disableSubmit() { document.forms[0].activestatus.value = "OFF"; }
+function setFaculty() {
+	if (queryCourseScheduleForm.courseno.value.length >= 2)	{
+		queryCourseScheduleForm.faculty.value = queryCourseScheduleForm.courseno.value.substring(0,2);
+	} else if (queryCourseScheduleForm.courseno.value.length == 0) {
+		queryCourseScheduleForm.faculty.value = "";
+	}
+}
+function checkDblClick(my_msg) {
+	if (canSubmit() == false) {	// It should not re-submit while the request is processing.
+		if (my_msg != null)
+			alert(my_msg);
+		return false;
+	}
+	disableSubmit();
+	return true;
+}
+function checkDblClickPlusTimeout(my_msg) {
+	if (canSubmit() == false) {
+		if (my_msg != null)
+			alert(my_msg);
+		return false;
+	}
+	disableSubmit();
+	startTimer();
+	return true;
+}
+function restartTimer() {
+	window.clearTimeout(timerId);
+	timerId = window.setTimeout("restartTimer()",2000);
+	enableSubmit();
+}
+function startTimer(timeout) {
+	my_timeout = timeout
+	timerId = window.setTimeout("restartTimer()",2000);
+	return true;	 
+}
+function Start() {
+	SetFocus();
+	SetSemester();
+	SetLangText(document.queryCourseScheduleForm);
+	ChangeText(document.queryCourseScheduleForm);
+	//hide('examdate0');
+	//hide('examdate1');
+	//if (document.queryCourseScheduleForm.examdate2 != null)
+	//	hide('examdate2');
+	ValidExamdate();
+	startTimer(5000);
+}
+function SetFocus() {
+	queryCourseScheduleForm.courseno.focus();
+	return;
+}
+function SetCourseNo() {
+	queryCourseScheduleForm.courseno.value = queryCourseScheduleForm.faculty.value;
+	return;
+}
+function SetSemester() {
+	queryCourseScheduleForm.semester.value = queryCourseScheduleForm.cursemester.value;
+	return;
+}
+/* Teeravut 
+function Change() {
+	if (queryCourseScheduleForm.lang.value == "T") {
+		if (queryCourseScheduleForm.semester.value == 3) {
+			document.all("TEXT1").innerText = 'ภาค';
+		} else {
+			document.all("TEXT1").innerText = 'ภาคการศึกษา';
+		}
+	} else {
+		document.all("TEXT1").innerText = 'SEMESTER ';
+	}
+	ValidExamdate();
+}
+*/
+function isblank(s) {
+	for(var i = 0; i < s.length; i++) {
+		var c = s.charAt(i);
+		if ((c != ' ') && (c != '\n') && (c != '\t'))
+			return false;
+		}
+	return true;
+}
+function isNumeric(s) {
+	for(var i = 0; i < s.length; i++) {
+		var c = s.charAt(i);
+		if (!isNblank(c)) {
+			if ((c < '0') || (c > '9'))
+				return false;
+		}
+	}
+	return true;
+}
+function isNblank(c) {
+	if ((c != ' ') && (c != '\n') && (c != '\t'))
+		return false;
+		return true;
+}
+function trimblank(s) {
+	var x = "";
+	for(var i = 0; i < s.length; i++) {
+		var c = s.charAt(i);
+		if ((c != ' ') && (c != '\n') && (c != '\t'))
+			x = x + c;
+	}
+	return x;
+}
+function cutstr(s) {
+	var x = "";
+	for(var i = 0; i < s.length; i++) {
+		var ch = s.charAt(i);
+		if ((ch != ':') && (ch != '.'))
+			x = x + ch;
+	}
+	return x;
+}
+function verify() {
+	if (queryCourseScheduleForm.lang.value == "T") {
+		if (checkDblClickPlusTimeout("กรุณารอสักครู่ !") == true)	{
+			if(document.queryCourseScheduleForm.coursetype.value.length == 0)	{
+				if (document.queryCourseScheduleForm.examdate.options.length == 0) {
+				 	alert("ไม่มีข้อมูลตารางสอนตารางสอบ");
+					return false;
+				}
+				if (queryCourseScheduleForm.studyProgram.value == "" && queryCourseScheduleForm.courseno.value.length < 7 ) {
+				 	alert("กรุณาระบุรหัสรายวิชาให้ครบ 7 ตัวอักษร");
+				 	queryCourseScheduleForm.courseno.select();
+				 	return false;
+				}
+				if (queryCourseScheduleForm.courseno.value.length < 2 && queryCourseScheduleForm.courseno.value.length != 0 && queryCourseScheduleForm.coursename.value.length < 4 && queryCourseScheduleForm.examdate.value == "" &&  queryCourseScheduleForm.genedcode.value == "") {
+				 	alert("กรุณาระบุรหัสรายวิชาอย่างน้อย 2 ตัวอักษร");
+				 	queryCourseScheduleForm.courseno.select();
+				 	return false;
+				} 	
+				//if (queryCourseScheduleForm.courseno.value.length < 4 && queryCourseScheduleForm.courseno.value.length != 0 && queryCourseScheduleForm.coursename.value.length < 4 && queryCourseScheduleForm.examdate.value == "" &&  queryCourseScheduleForm.genedcode.value == "") {
+				// 	alert("กรุณาระบุรหัสรายวิชาอย่างน้อย 4 ตัวอักษร");
+				// 	queryCourseScheduleForm.courseno.select();
+				// 	return false;
+				//} 	
+				if (queryCourseScheduleForm.courseno.value.length == 0 && queryCourseScheduleForm.coursename.value.length < 2 && queryCourseScheduleForm.coursename.value.length != 0 && queryCourseScheduleForm.examdate.value == "" &&  queryCourseScheduleForm.genedcode.value == "") {
+				    alert("กรุณาระบุชื่อย่อรายวิชาอย่างน้อย 2 ตัวอักษร");
+					 queryCourseScheduleForm.coursename.select();
+				    return false;
+				}
+				if (queryCourseScheduleForm.courseno.value.length == 0 && queryCourseScheduleForm.coursename.value.length == 0 && queryCourseScheduleForm.examdate.value == "" &&  queryCourseScheduleForm.genedcode.value == "") {
+				    alert("กรุณาระบุรหัสรายวิชาอย่างน้อย 4 ตัวอักษร");
+					 queryCourseScheduleForm.courseno.focus();
+				    return false;
+				}
+			} else if(document.queryCourseScheduleForm.coursetype.value == '2' && queryCourseScheduleForm.courseno.value.length < 2)	{
+			    alert("กรุณาระบุรหัสรายวิชาอย่างน้อย 2 ตัวอักษร");
+			    queryCourseScheduleForm.courseno.select();
+				return false;
+			}
+			queryCourseScheduleForm.acadyear.value = queryCourseScheduleForm.acadyearEfd.value;
+			document.open("/cu/cs/QueryCourseScheduleNew/Body_QueryCourseSchedule.html","cs_right","") ;
+			document.forms[0].activestatus.value = "OFF";
+			return true;
+		} else {
+			return false;
+		}
+	} else {
+		if (checkDblClickPlusTimeout("Please wait a moment !") == true) {
+			if(document.queryCourseScheduleForm.coursetype.value.length == 0) {
+				if (document.queryCourseScheduleForm.examdate.options.length == 0) {
+				 	alert("There aren't Course Schedule in this semester");
+					return false;
+				}
+				if (queryCourseScheduleForm.studyProgram.value == "" && queryCourseScheduleForm.courseno.value.length < 7 ) {
+				 	alert("Please enter the Course Code 7 digits");
+				 	queryCourseScheduleForm.courseno.select();
+				 	return false;
+				}
+				if (queryCourseScheduleForm.courseno.value.length < 2 && queryCourseScheduleForm.courseno.value.length != 0 && queryCourseScheduleForm.coursename.value.length < 4 && queryCourseScheduleForm.examdate.value == "" &&  queryCourseScheduleForm.genedcode.value == "") {
+				 	alert("Please enter the Course Code at least 2 digits");
+				 	queryCourseScheduleForm.courseno.select();
+				 	return false;
+				} 	
+				//if (queryCourseScheduleForm.courseno.value.length < 4 && queryCourseScheduleForm.courseno.value.length != 0 && queryCourseScheduleForm.coursename.value.length < 4 && queryCourseScheduleForm.examdate.value == "" &&  queryCourseScheduleForm.genedcode.value == "") {
+				// 	alert("Please enter the Course Code at least 4 digits");
+				// 	queryCourseScheduleForm.courseno.select();
+				// 	return false;
+				//} 	
+				if (queryCourseScheduleForm.courseno.value.length == 0 && queryCourseScheduleForm.coursename.value.length < 2 && queryCourseScheduleForm.coursename.value.length != 0 && queryCourseScheduleForm.examdate.value == "" &&  queryCourseScheduleForm.genedcode.value == "") {
+				    alert("Please enter the Course Name at least 2 chars");
+					 queryCourseScheduleForm.coursename.select();
+				    return false;
+				}
+				if (queryCourseScheduleForm.courseno.value.length == 0 && queryCourseScheduleForm.coursename.value.length == 0 && queryCourseScheduleForm.examdate.value == "" &&  queryCourseScheduleForm.genedcode.value == "") {
+				    alert("Please enter the Course Code at least 4 digits");
+					 queryCourseScheduleForm.courseno.focus();
+				    return false;
+				}
+			} else if(document.queryCourseScheduleForm.coursetype.value == '2' && queryCourseScheduleForm.courseno.value.length < 2)	{
+			    alert("Please enter the Course Code at least 2 digits");
+			    queryCourseScheduleForm.courseno.select();
+				return false;
+			}
+			queryCourseScheduleForm.acadyear.value = parseInt(queryCourseScheduleForm.acadyearEfd.value) + 543;
+			document.open("/cu/cs/QueryCourseScheduleNew/Body_QueryCourseSchedule.html","cs_right","") ;
+			document.forms[0].activestatus.value = "OFF";
+			return true;
+		}	else {
+			return false;
+		}
+	}
+}
+function UpperCase(object) {
+  	object.value = object.value.toUpperCase();
+}
+function show(object) {
+	if (document.layers && document.layers[object])
+		document.layers[object].visibility = 'visible';
+	else if (document.all) {
+		document.all[object].style.visibility = 'visible';
+		document.all[object].style.zIndex = 100; 
+	}
+}
+function hide(object) {
+	if (document.layers && document.layers[object])
+		document.layers[object].visibility = 'hidden';    
+	else if (document.all)
+		document.all[object].style.visibility = 'hidden';
+}
+function populateForm(object,objval) {
+	//alert(" Display objvalue ==>"+objval);
+	var pFlag = true;
+	object.examdate.options.length = 0;
+	addOption(object.examdate,"   ","")				 
+	addOption(object.examdate,"TDF","TDF")
+	for (var i=0; i < object.examdateCombo.length; i++) {
+		var examDate = object.examdateCombo.options[i].value.substring(0,6);
+		if (examDate.indexOf(objval) == 0) {
+			var examtext  = object.examdateCombo.options[i].text;
+			var examvalue = object.examdateCombo.options[i].value.substring(6);
+			addOption(object.examdate,examtext,examvalue)
+			pFlag = false;
+		}
+	}
+	if (pFlag) {
+		object.examdate.options.length = 0;
+	}
+}					 
+function addOption(object,text,value) {
+	var optionName = new Option(text, value, false, false)
+	object.options[object.length] = optionName;
+} 
+function prevCurSemester() {
+	if (queryCourseScheduleForm.cursemester.value - 1 == 0) 
+		return 3;
+	else
+		return queryCourseScheduleForm.cursemester.value - 1;
+}
+function prevCurYear() {
+	if (queryCourseScheduleForm.cursemester.value - 1 == 0) 
+		return queryCourseScheduleForm.curacadyear.value - 1;
+	else
+		return queryCourseScheduleForm.curacadyear.value;
+}
+function nextCurSemester() {
+	if ((queryCourseScheduleForm.cursemester.value - 1) + 2 == 4) 
+		return 1;
+	else
+		return (queryCourseScheduleForm.cursemester.value - 1) + 2;
+}
+function nextCurYear() {
+	if ((queryCourseScheduleForm.cursemester.value - 1) + 2 == 4) 
+		return (queryCourseScheduleForm.curacadyear.value - 1) + 2;
+	else
+		return queryCourseScheduleForm.curacadyear.value;
+}
+function ValidExamdate() {	
+	var year = document.queryCourseScheduleForm.acadyearEfd.value;
+	var semt = document.queryCourseScheduleForm.semester.value;
+	var prog = document.queryCourseScheduleForm.studyProgram.value;
+	if (document.queryCourseScheduleForm.lang.value == 'T')   
+		 year = year - 543;
+	populateForm(document.queryCourseScheduleForm,prog+year+semt);
+}
+function CheckExamTime(object,times) {
+	if (object.value.length > 0) {
+		cutstr(object.value);
+		var strtime = cutstr(object.value);
+		times.value = cutstr(object.value);
+		if (isNumeric(strtime)) {
+			number = Math.floor(strtime - 0);
+			if (number < 0 || number > 2359) {
+				if (queryCourseScheduleForm.lang.value == "T") 
+					alert("โปรดป้อนเวลาระหว่าง 000 ถึง 2359");
+				else
+					alert("Please enter exam time between 000 to 2359");
+				object.select();
+				return false;
+			}
+			if (object.value.length == 3) {
+				object.value = "0" + object.value;
+				times.value	 = object.value;
+			}
+		} else {
+		   if (queryCourseScheduleForm.lang.value == "T") 
+				alert("เวลาไม่ถูกต้อง");
+			else
+				alert("Invalid Exam Time");
+			object.select();
+			return false;
+		}
+	}
+}	
+</script>
+<BASE TARGET="_parent">
+</HEAD>
+<BODY BGCOLOR="#ffcccc"  LINK="#0000FF" VLINK="#800080" TEXT="#000000" TOPMARGIN=0 LEFTMARGIN=0 MARGINWIDTH=0 MARGINHEIGHT=0 onLoad="Start()">
+
+
+
+
+
+
+
+
+
+
+<FORM NAME="queryCourseScheduleForm" METHOD="GET" ACTION="/servlet/com.dtm.chula.cs.servlet.QueryCourseScheduleNew.CourseListNewServlet" TARGET="cs_left" onSubmit="return verify();">
+	<TABLE BORDER=0 WIDTH=700> 
+	
+	      
+		<TD><NOBR><B><FONT COLOR="#0000CC" SIZE="+2" FACE="MS Sans Serif">&nbsp;สอบถามตารางสอนตารางสอบ</FONT></B>
+	
+			<DIV style="display:none">
+			<SELECT ID="examdateCombo" NAME="examdateCombo">
+				
+			          
+						<OPTION VALUE="I2018207/05/1476">7 พ.ค. 2019</OPTION>
+					
+				
+			          
+						<OPTION VALUE="I2018208/05/1476">8 พ.ค. 2019</OPTION>
+					
+				
+			          
+						<OPTION VALUE="I2018209/05/1476">9 พ.ค. 2019</OPTION>
+					
+				
+			          
+						<OPTION VALUE="I2018210/05/1476">10 พ.ค. 2019</OPTION>
+					
+				
+			          
+						<OPTION VALUE="I2018211/05/1476">11 พ.ค. 2019</OPTION>
+					
+				
+			          
+						<OPTION VALUE="I2018212/05/1476">12 พ.ค. 2019</OPTION>
+					
+				
+			          
+						<OPTION VALUE="I2018213/05/1476">13 พ.ค. 2019</OPTION>
+					
+				
+			          
+						<OPTION VALUE="I2018214/05/1476">14 พ.ค. 2019</OPTION>
+					
+				
+			          
+						<OPTION VALUE="I2018215/05/1476">15 พ.ค. 2019</OPTION>
+					
+				
+			          
+						<OPTION VALUE="I2018216/05/1476">16 พ.ค. 2019</OPTION>
+					
+				
+			          
+						<OPTION VALUE="I2018217/05/1476">17 พ.ค. 2019</OPTION>
+					
+				
+			          
+						<OPTION VALUE="I2018218/05/1476">18 พ.ค. 2019</OPTION>
+					
+				
+			          
+						<OPTION VALUE="I2018219/05/1476">19 พ.ค. 2019</OPTION>
+					
+				
+			          
+						<OPTION VALUE="I2018220/05/1476">20 พ.ค. 2019</OPTION>
+					
+				
+			          
+						<OPTION VALUE="I2018221/05/1476">21 พ.ค. 2019</OPTION>
+					
+				
+			          
+						<OPTION VALUE="I2018222/05/1476">22 พ.ค. 2019</OPTION>
+					
+				
+			          
+						<OPTION VALUE="I2018315/07/1476">15 ก.ค. 2019</OPTION>
+					
+				
+			          
+						<OPTION VALUE="I2018316/07/1476">16 ก.ค. 2019</OPTION>
+					
+				
+			          
+						<OPTION VALUE="I2018317/07/1476">17 ก.ค. 2019</OPTION>
+					
+				
+			          
+						<OPTION VALUE="I2018318/07/1476">18 ก.ค. 2019</OPTION>
+					
+				
+			          
+						<OPTION VALUE="I2018319/07/1476">19 ก.ค. 2019</OPTION>
+					
+				
+			          
+						<OPTION VALUE="I2019102/12/1476">2 ธ.ค. 2019</OPTION>
+					
+				
+			          
+						<OPTION VALUE="I2019103/12/1476">3 ธ.ค. 2019</OPTION>
+					
+				
+			          
+						<OPTION VALUE="I2019104/12/1476">4 ธ.ค. 2019</OPTION>
+					
+				
+			          
+						<OPTION VALUE="I2019105/12/1476">5 ธ.ค. 2019</OPTION>
+					
+				
+			          
+						<OPTION VALUE="I2019106/12/1476">6 ธ.ค. 2019</OPTION>
+					
+				
+			          
+						<OPTION VALUE="I2019107/12/1476">7 ธ.ค. 2019</OPTION>
+					
+				
+			          
+						<OPTION VALUE="I2019108/12/1476">8 ธ.ค. 2019</OPTION>
+					
+				
+			          
+						<OPTION VALUE="I2019109/12/1476">9 ธ.ค. 2019</OPTION>
+					
+				
+			          
+						<OPTION VALUE="I2019110/12/1476">10 ธ.ค. 2019</OPTION>
+					
+				
+			          
+						<OPTION VALUE="I2019111/12/1476">11 ธ.ค. 2019</OPTION>
+					
+				
+			          
+						<OPTION VALUE="I2019112/12/1476">12 ธ.ค. 2019</OPTION>
+					
+				
+			          
+						<OPTION VALUE="I2019113/12/1476">13 ธ.ค. 2019</OPTION>
+					
+				
+			          
+						<OPTION VALUE="I2019114/12/1476">14 ธ.ค. 2019</OPTION>
+					
+				
+			          
+						<OPTION VALUE="I2019115/12/1476">15 ธ.ค. 2019</OPTION>
+					
+				
+			          
+						<OPTION VALUE="I2019116/12/1476">16 ธ.ค. 2019</OPTION>
+					
+				
+			          
+						<OPTION VALUE="I2019117/12/1476">17 ธ.ค. 2019</OPTION>
+					
+				
+			          
+						<OPTION VALUE="I2019205/05/1477">5 พ.ค. 2020</OPTION>
+					
+				
+			          
+						<OPTION VALUE="I2019206/05/1477">6 พ.ค. 2020</OPTION>
+					
+				
+			          
+						<OPTION VALUE="I2019207/05/1477">7 พ.ค. 2020</OPTION>
+					
+				
+			          
+						<OPTION VALUE="I2019208/05/1477">8 พ.ค. 2020</OPTION>
+					
+				
+			          
+						<OPTION VALUE="I2019209/05/1477">9 พ.ค. 2020</OPTION>
+					
+				
+			          
+						<OPTION VALUE="I2019210/05/1477">10 พ.ค. 2020</OPTION>
+					
+				
+			          
+						<OPTION VALUE="I2019211/05/1477">11 พ.ค. 2020</OPTION>
+					
+				
+			          
+						<OPTION VALUE="I2019212/05/1477">12 พ.ค. 2020</OPTION>
+					
+				
+			          
+						<OPTION VALUE="I2019213/05/1477">13 พ.ค. 2020</OPTION>
+					
+				
+			          
+						<OPTION VALUE="I2019214/05/1477">14 พ.ค. 2020</OPTION>
+					
+				
+			          
+						<OPTION VALUE="I2019215/05/1477">15 พ.ค. 2020</OPTION>
+					
+				
+			          
+						<OPTION VALUE="I2019216/05/1477">16 พ.ค. 2020</OPTION>
+					
+				
+			          
+						<OPTION VALUE="I2019217/05/1477">17 พ.ค. 2020</OPTION>
+					
+				
+			          
+						<OPTION VALUE="I2019218/05/1477">18 พ.ค. 2020</OPTION>
+					
+				
+			          
+						<OPTION VALUE="I2019219/05/1477">19 พ.ค. 2020</OPTION>
+					
+				
+			          
+						<OPTION VALUE="I2019220/05/1477">20 พ.ค. 2020</OPTION>
+					
+				
+			          
+						<OPTION VALUE="I2019313/07/1477">13 ก.ค. 2020</OPTION>
+					
+				
+			          
+						<OPTION VALUE="I2019314/07/1477">14 ก.ค. 2020</OPTION>
+					
+				
+			          
+						<OPTION VALUE="I2019315/07/1477">15 ก.ค. 2020</OPTION>
+					
+				
+			          
+						<OPTION VALUE="I2019316/07/1477">16 ก.ค. 2020</OPTION>
+					
+				
+			          
+						<OPTION VALUE="I2019317/07/1477">17 ก.ค. 2020</OPTION>
+					
+				
+			          
+						<OPTION VALUE="S2018207/05/1476">7 พ.ค. 2019</OPTION>
+					
+				
+			          
+						<OPTION VALUE="S2018208/05/1476">8 พ.ค. 2019</OPTION>
+					
+				
+			          
+						<OPTION VALUE="S2018209/05/1476">9 พ.ค. 2019</OPTION>
+					
+				
+			          
+						<OPTION VALUE="S2018210/05/1476">10 พ.ค. 2019</OPTION>
+					
+				
+			          
+						<OPTION VALUE="S2018211/05/1476">11 พ.ค. 2019</OPTION>
+					
+				
+			          
+						<OPTION VALUE="S2018212/05/1476">12 พ.ค. 2019</OPTION>
+					
+				
+			          
+						<OPTION VALUE="S2018213/05/1476">13 พ.ค. 2019</OPTION>
+					
+				
+			          
+						<OPTION VALUE="S2018214/05/1476">14 พ.ค. 2019</OPTION>
+					
+				
+			          
+						<OPTION VALUE="S2018215/05/1476">15 พ.ค. 2019</OPTION>
+					
+				
+			          
+						<OPTION VALUE="S2018216/05/1476">16 พ.ค. 2019</OPTION>
+					
+				
+			          
+						<OPTION VALUE="S2018217/05/1476">17 พ.ค. 2019</OPTION>
+					
+				
+			          
+						<OPTION VALUE="S2018218/05/1476">18 พ.ค. 2019</OPTION>
+					
+				
+			          
+						<OPTION VALUE="S2018219/05/1476">19 พ.ค. 2019</OPTION>
+					
+				
+			          
+						<OPTION VALUE="S2018220/05/1476">20 พ.ค. 2019</OPTION>
+					
+				
+			          
+						<OPTION VALUE="S2018221/05/1476">21 พ.ค. 2019</OPTION>
+					
+				
+			          
+						<OPTION VALUE="S2018222/05/1476">22 พ.ค. 2019</OPTION>
+					
+				
+			          
+						<OPTION VALUE="S2018315/07/1476">15 ก.ค. 2019</OPTION>
+					
+				
+			          
+						<OPTION VALUE="S2018316/07/1476">16 ก.ค. 2019</OPTION>
+					
+				
+			          
+						<OPTION VALUE="S2018317/07/1476">17 ก.ค. 2019</OPTION>
+					
+				
+			          
+						<OPTION VALUE="S2018318/07/1476">18 ก.ค. 2019</OPTION>
+					
+				
+			          
+						<OPTION VALUE="S2018319/07/1476">19 ก.ค. 2019</OPTION>
+					
+				
+			          
+						<OPTION VALUE="S2019102/12/1476">2 ธ.ค. 2019</OPTION>
+					
+				
+			          
+						<OPTION VALUE="S2019103/12/1476">3 ธ.ค. 2019</OPTION>
+					
+				
+			          
+						<OPTION VALUE="S2019104/12/1476">4 ธ.ค. 2019</OPTION>
+					
+				
+			          
+						<OPTION VALUE="S2019105/12/1476">5 ธ.ค. 2019</OPTION>
+					
+				
+			          
+						<OPTION VALUE="S2019106/12/1476">6 ธ.ค. 2019</OPTION>
+					
+				
+			          
+						<OPTION VALUE="S2019107/12/1476">7 ธ.ค. 2019</OPTION>
+					
+				
+			          
+						<OPTION VALUE="S2019108/12/1476">8 ธ.ค. 2019</OPTION>
+					
+				
+			          
+						<OPTION VALUE="S2019109/12/1476">9 ธ.ค. 2019</OPTION>
+					
+				
+			          
+						<OPTION VALUE="S2019110/12/1476">10 ธ.ค. 2019</OPTION>
+					
+				
+			          
+						<OPTION VALUE="S2019111/12/1476">11 ธ.ค. 2019</OPTION>
+					
+				
+			          
+						<OPTION VALUE="S2019112/12/1476">12 ธ.ค. 2019</OPTION>
+					
+				
+			          
+						<OPTION VALUE="S2019113/12/1476">13 ธ.ค. 2019</OPTION>
+					
+				
+			          
+						<OPTION VALUE="S2019114/12/1476">14 ธ.ค. 2019</OPTION>
+					
+				
+			          
+						<OPTION VALUE="S2019115/12/1476">15 ธ.ค. 2019</OPTION>
+					
+				
+			          
+						<OPTION VALUE="S2019116/12/1476">16 ธ.ค. 2019</OPTION>
+					
+				
+			          
+						<OPTION VALUE="S2019117/12/1476">17 ธ.ค. 2019</OPTION>
+					
+				
+			          
+						<OPTION VALUE="S2019205/05/1477">5 พ.ค. 2020</OPTION>
+					
+				
+			          
+						<OPTION VALUE="S2019206/05/1477">6 พ.ค. 2020</OPTION>
+					
+				
+			          
+						<OPTION VALUE="S2019207/05/1477">7 พ.ค. 2020</OPTION>
+					
+				
+			          
+						<OPTION VALUE="S2019208/05/1477">8 พ.ค. 2020</OPTION>
+					
+				
+			          
+						<OPTION VALUE="S2019209/05/1477">9 พ.ค. 2020</OPTION>
+					
+				
+			          
+						<OPTION VALUE="S2019210/05/1477">10 พ.ค. 2020</OPTION>
+					
+				
+			          
+						<OPTION VALUE="S2019211/05/1477">11 พ.ค. 2020</OPTION>
+					
+				
+			          
+						<OPTION VALUE="S2019212/05/1477">12 พ.ค. 2020</OPTION>
+					
+				
+			          
+						<OPTION VALUE="S2019213/05/1477">13 พ.ค. 2020</OPTION>
+					
+				
+			          
+						<OPTION VALUE="S2019214/05/1477">14 พ.ค. 2020</OPTION>
+					
+				
+			          
+						<OPTION VALUE="S2019215/05/1477">15 พ.ค. 2020</OPTION>
+					
+				
+			          
+						<OPTION VALUE="S2019216/05/1477">16 พ.ค. 2020</OPTION>
+					
+				
+			          
+						<OPTION VALUE="S2019217/05/1477">17 พ.ค. 2020</OPTION>
+					
+				
+			          
+						<OPTION VALUE="S2019218/05/1477">18 พ.ค. 2020</OPTION>
+					
+				
+			          
+						<OPTION VALUE="S2019219/05/1477">19 พ.ค. 2020</OPTION>
+					
+				
+			          
+						<OPTION VALUE="S2019220/05/1477">20 พ.ค. 2020</OPTION>
+					
+				
+			          
+						<OPTION VALUE="S2019313/07/1477">13 ก.ค. 2020</OPTION>
+					
+				
+			          
+						<OPTION VALUE="S2019314/07/1477">14 ก.ค. 2020</OPTION>
+					
+				
+			          
+						<OPTION VALUE="S2019315/07/1477">15 ก.ค. 2020</OPTION>
+					
+				
+			          
+						<OPTION VALUE="S2019316/07/1477">16 ก.ค. 2020</OPTION>
+					
+				
+			          
+						<OPTION VALUE="S2019317/07/1477">17 ก.ค. 2020</OPTION>
+					
+				
+			          
+						<OPTION VALUE="T2018225/03/1476">25 มี.ค. 2019</OPTION>
+					
+				
+			          
+						<OPTION VALUE="T2018226/03/1476">26 มี.ค. 2019</OPTION>
+					
+				
+			          
+						<OPTION VALUE="T2018227/03/1476">27 มี.ค. 2019</OPTION>
+					
+				
+			          
+						<OPTION VALUE="T2018228/03/1476">28 มี.ค. 2019</OPTION>
+					
+				
+			          
+						<OPTION VALUE="T2018229/03/1476">29 มี.ค. 2019</OPTION>
+					
+				
+			          
+						<OPTION VALUE="T2018322/07/1476">22 ก.ค. 2019</OPTION>
+					
+				
+			          
+						<OPTION VALUE="T2018323/07/1476">23 ก.ค. 2019</OPTION>
+					
+				
+			          
+						<OPTION VALUE="T2018324/07/1476">24 ก.ค. 2019</OPTION>
+					
+				
+			          
+						<OPTION VALUE="T2018325/07/1476">25 ก.ค. 2019</OPTION>
+					
+				
+			          
+						<OPTION VALUE="T2018326/07/1476">26 ก.ค. 2019</OPTION>
+					
+				
+			          
+						<OPTION VALUE="T2019125/11/1476">25 พ.ย. 2019</OPTION>
+					
+				
+			          
+						<OPTION VALUE="T2019126/11/1476">26 พ.ย. 2019</OPTION>
+					
+				
+			          
+						<OPTION VALUE="T2019127/11/1476">27 พ.ย. 2019</OPTION>
+					
+				
+			          
+						<OPTION VALUE="T2019128/11/1476">28 พ.ย. 2019</OPTION>
+					
+				
+			          
+						<OPTION VALUE="T2019129/11/1476">29 พ.ย. 2019</OPTION>
+					
+				
+			          
+						<OPTION VALUE="T2019223/03/1477">23 มี.ค. 2020</OPTION>
+					
+				
+			          
+						<OPTION VALUE="T2019224/03/1477">24 มี.ค. 2020</OPTION>
+					
+				
+			          
+						<OPTION VALUE="T2019225/03/1477">25 มี.ค. 2020</OPTION>
+					
+				
+			          
+						<OPTION VALUE="T2019226/03/1477">26 มี.ค. 2020</OPTION>
+					
+				
+			          
+						<OPTION VALUE="T2019227/03/1477">27 มี.ค. 2020</OPTION>
+					
+				
+			          
+						<OPTION VALUE="T2019320/07/1477">20 ก.ค. 2020</OPTION>
+					
+				
+			          
+						<OPTION VALUE="T2019321/07/1477">21 ก.ค. 2020</OPTION>
+					
+				
+			          
+						<OPTION VALUE="T2019322/07/1477">22 ก.ค. 2020</OPTION>
+					
+				
+			          
+						<OPTION VALUE="T2019323/07/1477">23 ก.ค. 2020</OPTION>
+					
+				
+			          
+						<OPTION VALUE="T2019324/07/1477">24 ก.ค. 2020</OPTION>
+					
+				
+			</SELECT>
+			</DIV></NOBR>
+		</TD>
+	</TABLE>		
+	<TABLE BORDER=0>
+    <TR>
+			<TD WIDTH=2></TD>
+			<TD WIDTH=550>
+			      
+				<FONT COLOR="#0000FF" SIZE="-1" FACE="MS Sans Serif">ระบบการศึกษา </FONT>
+			
+				<SELECT ID="studyProgram" NAME="studyProgram" TABINDEX=1 OnChange="SetSemesterOption(this.form);ValidExamdate();">
+					<OPTION VALUE= > </OPTION>
+				
+					
+					      
+						<OPTION VALUE=S>ทวิภาค</OPTION>
+					
+				
+					
+					      
+						<OPTION VALUE=T>ตรีภาค</OPTION>
+					
+				
+					
+					      
+						<OPTION VALUE=I>ทวิภาค-นานาชาติ</OPTION>
+					
+				
+				</SELECT>
+			      
+				<FONT ID="TEXT1" COLOR="#0000FF" SIZE="-1" FACE="MS Sans Serif">ภาคการศึกษา</FONT>
+			
+				<SELECT ID="semester" NAME="semester" TABINDEX=1 OnChange="ChangeText(this.form);ValidExamdate();">
+				
+					
+					      
+						<OPTION VALUE=1         >ต้น</OPTION>
+					
+				
+					
+					      
+						<OPTION VALUE=2         >ปลาย</OPTION>
+					
+				
+					
+					      
+						<OPTION VALUE=3         >ภาคฤดูร้อน</OPTION>
+					
+				
+				</SELECT>
+			      
+				<FONT COLOR="#0000FF" SIZE="-1" FACE="MS Sans Serif">ปีการศึกษา</FONT>
+				<INPUT ID="acadyearEfd" TYPE=TEXT NAME="acadyearEfd" SIZE=4 MAXLENGTH=4 TABINDEX="2" VALUE=2562 OnChange="ValidExamdate()">
+			
+			</TD>
+		      
+			<TD><INPUT TYPE="image" NAME="submit"  SRC="/cu/images/search.gif" ALIGN=TOP BORDER=0 TABINDEX="9"></TD>
+		
+		</TR>
+	</TABLE>
+	<TABLE BORDER=0>
+          
+	    <TR>
+			<TD WIDTH=2></TD>
+		   <TD><NOBR><FONT COLOR="#0000FF" SIZE="-1" FACE="MS Sans Serif">รหัสรายวิชา</FONT></NOBR></TD>
+	      <TD><NOBR><FONT COLOR="#0000FF" SIZE="-1" FACE="MS Sans Serif">ชื่อย่อรายวิชา </FONT></NOBR></TD>
+	      <TD><NOBR><FONT COLOR="#0000FF" SIZE="-1" FACE="MS Sans Serif">วันสอบ </FONT></NOBR></TD>
+			<TD COLSPAN=3 ALIGN=CENTER><NOBR><FONT COLOR="#0000FF" SIZE="-1" FACE="MS Sans Serif">เวลาสอบ </FONT></NOBR></TD>
+			<TD><NOBR><FONT COLOR="#0000FF" SIZE="-1" FACE="MS Sans Serif">หน่วยงาน</FONT></NOBR></TD>
+			<TD><NOBR><FONT COLOR="#0000FF" SIZE="-1" FACE="MS Sans Serif">ประเภทรายวิชา</FONT></NOBR></TD>
+		<!--	<TD><NOBR><FONT COLOR="#0000FF" SIZE="-1" FACE="MS Sans Serif">หมวดวิชา</FONT></NOBR></TD>  -->
+		 </TR>
+	
+	 <TR>		
+		<TD WIDTH=2></TD>
+	   <TD><INPUT ID="courseno" TYPE=TEXT NAME="courseno" VALUE="" SIZE=8 MAXLENGTH=8 TABINDEX="3" onKeyUp="setFaculty()"></TD>
+	   <TD><INPUT ID="coursename" TYPE=TEXT NAME="coursename" VALUE="" SIZE=12 MAXLENGTH=20 TABINDEX="4" onChange="UpperCase(document.queryCourseScheduleForm.coursename)"></TD>
+      <TD><NOBR><SELECT ID="examdate" NAME="examdate" style="width:25mm" TABINDEX="5" onChange="show('examdate')">
+               	<OPTION VALUE="">
+						</OPTION>
+			 		 </SELECT></NOBR></TD>					 
+		<TD><INPUT ID="examstartshow" TYPE=TEXT NAME="examstartshow" VALUE="" SIZE=4 MAXLENGTH=5 TABINDEX="6"  
+				onChange="CheckExamTime(document.queryCourseScheduleForm.examstartshow,document.queryCourseScheduleForm.examstart)"></TD>
+		<TD><FONT COLOR="#0000FF" SIZE="-1" FACE="MS Sans Serif">-</FONT></TD>
+      <TD><INPUT ID="examendshow" TYPE=TEXT NAME="examendshow" VALUE="" SIZE=4 MAXLENGTH=5 TABINDEX="7" 
+				onChange="CheckExamTime(document.queryCourseScheduleForm.examendshow,document.queryCourseScheduleForm.examend)"></TD>
+             
+		<TD><SELECT ID="faculty" NAME="faculty" TABINDEX="8" OnClick="SetCourseNo()">
+               <OPTION VALUE="" SELECTED></OPTION>
+	            
+					
+				         
+               	<OPTION VALUE=01>สถาบันภาษาไทยสิรินธร</OPTION>
+					
+               
+					
+				         
+               	<OPTION VALUE=02>ศูนย์การศึกษาทั่วไป</OPTION>
+					
+               
+					
+				         
+               	<OPTION VALUE=20>บัณฑิตวิทยาลัย</OPTION>
+					
+               
+					
+				         
+               	<OPTION VALUE=21>คณะวิศวกรรมศาสตร์</OPTION>
+					
+               
+					
+				         
+               	<OPTION VALUE=22>คณะอักษรศาสตร์</OPTION>
+					
+               
+					
+				         
+               	<OPTION VALUE=23>คณะวิทยาศาสตร์</OPTION>
+					
+               
+					
+				         
+               	<OPTION VALUE=24>คณะรัฐศาสตร์</OPTION>
+					
+               
+					
+				         
+               	<OPTION VALUE=25>คณะสถาปัตยกรรมศาสตร์</OPTION>
+					
+               
+					
+				         
+               	<OPTION VALUE=26>คณะพาณิชยศาสตร์และการบัญชี</OPTION>
+					
+               
+					
+				         
+               	<OPTION VALUE=27>คณะครุศาสตร์</OPTION>
+					
+               
+					
+				         
+               	<OPTION VALUE=28>คณะนิเทศศาสตร์</OPTION>
+					
+               
+					
+				         
+               	<OPTION VALUE=29>คณะเศรษฐศาสตร์</OPTION>
+					
+               
+					
+				         
+               	<OPTION VALUE=30>คณะแพทยศาสตร์</OPTION>
+					
+               
+					
+				         
+               	<OPTION VALUE=31>คณะสัตวแพทยศาสตร์</OPTION>
+					
+               
+					
+				         
+               	<OPTION VALUE=32>คณะทันตแพทยศาสตร์</OPTION>
+					
+               
+					
+				         
+               	<OPTION VALUE=33>คณะเภสัชศาสตร์</OPTION>
+					
+               
+					
+				         
+               	<OPTION VALUE=34>คณะนิติศาสตร์</OPTION>
+					
+               
+					
+				         
+               	<OPTION VALUE=35>คณะศิลปกรรมศาสตร์</OPTION>
+					
+               
+					
+				         
+               	<OPTION VALUE=36>คณะพยาบาลศาสตร์</OPTION>
+					
+               
+					
+				         
+               	<OPTION VALUE=37>คณะสหเวชศาสตร์</OPTION>
+					
+               
+					
+				         
+               	<OPTION VALUE=38>คณะจิตวิทยา</OPTION>
+					
+               
+					
+				         
+               	<OPTION VALUE=39>คณะวิทยาศาสตร์การกีฬา</OPTION>
+					
+               
+					
+				         
+               	<OPTION VALUE=40>สำนักวิชาทรัพยากรการเกษตร</OPTION>
+					
+               
+					
+				         
+               	<OPTION VALUE=51>วิทยาลัยประชากรศาสตร์</OPTION>
+					
+               
+					
+				         
+               	<OPTION VALUE=53>วิทยาลัยวิทยาศาสตร์สาธารณสุข</OPTION>
+					
+               
+					
+				         
+               	<OPTION VALUE=55>สถาบันภาษา</OPTION>
+					
+               
+					
+				         
+               	<OPTION VALUE=56>สถาบันนวัตกรรมบูรณาการแห่งจุฬาลงกรณ์มหาวิทยาลัย</OPTION>
+					
+               
+					
+				         
+               	<OPTION VALUE=58>สถาบันบัณฑิตบริหารธุรกิจ ศศินทร์ฯ</OPTION>
+					
+               
+          </SELECT></TD>
+		<TD><SELECT ID="coursetype" NAME="coursetype" TABINDEX="9" >
+				         
+	               <OPTION VALUE="" SELECTED>ทุกรายวิชา</OPTION>
+	         <!--      <OPTION VALUE="1" >รายวิชาศึกษาทั่วไป</OPTION>  -->
+	               <OPTION VALUE="2" >กลุ่มรายวิชา</OPTION>
+					
+          </SELECT></TD>
+		<TD>    <INPUT TYPE=HIDDEN NAME="genedcode" VALUE="" TABINDEX="8">
+		      <!-- <SELECT ID="genedcode" NAME="genedcode" TABINDEX="8" OnClick="SetCourseNo()">
+               <OPTION VALUE="" SELECTED></OPTION>
+	            
+					
+				         
+               	<OPTION VALUE=1         >สังคมศาสตร์</OPTION>
+					
+               
+					
+				         
+               	<OPTION VALUE=2         >มนุษยศาสตร์</OPTION>
+					
+               
+					
+				         
+               	<OPTION VALUE=3         >วิทยาศาสตร์-คณิตศาสตร์</OPTION>
+					
+               
+					
+				         
+               	<OPTION VALUE=4         >สหศาสตร์</OPTION>
+					
+               
+					
+				         
+               	<OPTION VALUE=5         >ภาษาต่างประเทศ</OPTION>
+					
+                
+          </SELECT>   --> </TD>
+	 </TR>
+  </TABLE>
+  <INPUT TYPE="hidden" NAME="cursemester" VALUE=1>
+  <INPUT TYPE="hidden" NAME="curacadyear" VALUE=2562>
+  <INPUT TYPE="hidden" NAME="examstart" VALUE="">
+  <INPUT TYPE="hidden" NAME="examend" VALUE="">
+  <INPUT TYPE="hidden" NAME="activestatus" VALUE="ON">  
+  <INPUT TYPE="hidden" NAME="acadyear" VALUE=2562>			
+  <INPUT TYPE="hidden" NAME="lang" VALUE=T>			
+  <INPUT TYPE="hidden" NAME="download" VALUE="download">			
+</FORM>
+</BODY>
+</HTML>
+ 
+
+

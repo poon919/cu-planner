@@ -1,0 +1,136 @@
+{
+  "code": "0201211",
+  "shortname": "MEDITAT LIFE DEV",
+  "name": {
+    "en": "MEDITATION FOR LIFE DEVELOPMENT",
+    "th": "สมาธิเพื่อพัฒนาชีวิต"
+  },
+  "faculty": "ศูนย์การศึกษาทั่วไป ( ศูนย์การศึกษาทั่วไป )",
+  "program": "S",
+  "acadyear": 2019,
+  "semester": "1",
+  "totalCredit": 3,
+  "creditDetail": "LECT 2.0 CR + NL23 1.0 CR",
+  "hourDetail": "LECT 2.0 HR + PRAC 2.0 HR",
+  "requirement": "-",
+  "exam": {
+    "midterm": {
+      "start": null,
+      "end": null,
+      "status": "TDF (รอประกาศ)"
+    },
+    "final": {
+      "start": null,
+      "end": null,
+      "status": "TDF (รอประกาศ)"
+    }
+  },
+  "sections": {
+    "1": {
+      "isOpen": true,
+      "no": "1",
+      "registered": 235,
+      "maxRegister": 200,
+      "timetables": [
+        {
+          "method": "LECT",
+          "days": [
+            "MO"
+          ],
+          "time": {
+            "start": "13:00",
+            "end": "15:00",
+            "status": ""
+          },
+          "building": "MAHIT",
+          "room": "402",
+          "instructor": "VPM",
+          "note": "GENED-HU"
+        },
+        {
+          "method": "PRAC",
+          "days": [
+            "MO"
+          ],
+          "time": {
+            "start": "15:00",
+            "end": "16:00",
+            "status": ""
+          },
+          "building": "MAHIT",
+          "room": "402",
+          "instructor": "VPM",
+          "note": ""
+        },
+        {
+          "method": "PRAC",
+          "days": [
+            "IA"
+          ],
+          "time": {
+            "start": null,
+            "end": null,
+            "status": "IA"
+          },
+          "building": "IA",
+          "room": "IA",
+          "instructor": "VPM",
+          "note": ""
+        }
+      ]
+    },
+    "2": {
+      "isOpen": true,
+      "no": "2",
+      "registered": 241,
+      "maxRegister": 200,
+      "timetables": [
+        {
+          "method": "LECT",
+          "days": [
+            "TH"
+          ],
+          "time": {
+            "start": "13:00",
+            "end": "15:00",
+            "status": ""
+          },
+          "building": "MAHIT",
+          "room": "402",
+          "instructor": "STAFF",
+          "note": "GENED-HU"
+        },
+        {
+          "method": "PRAC",
+          "days": [
+            "TH"
+          ],
+          "time": {
+            "start": "15:00",
+            "end": "16:00",
+            "status": ""
+          },
+          "building": "MAHIT",
+          "room": "402",
+          "instructor": "STAFF",
+          "note": "GENED"
+        },
+        {
+          "method": "PRAC",
+          "days": [
+            "IA"
+          ],
+          "time": {
+            "start": null,
+            "end": null,
+            "status": "IA"
+          },
+          "building": "IA",
+          "room": "IA",
+          "instructor": "STAFF",
+          "note": ""
+        }
+      ]
+    }
+  }
+}

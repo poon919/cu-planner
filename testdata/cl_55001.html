@@ -1,0 +1,190 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 FINAL//EN">
+
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html;">
+<META NAME="Generator" CONTENT="NetObjects Fusion 4.0 for Windows">
+<TITLE>Course List</TITLE>
+<script type="text/javascript">
+var my_timeout = 5000;	// 1 second
+var timerID = window.setTimeout("", my_timeout);
+function canSubmit() {
+	return (document.forms[0].activestatus.value == "ON"); 
+}
+function enableSubmit() {
+	document.forms[0].activestatus.value = "ON"; 
+}
+function disableSubmit() {
+	document.forms[0].activestatus.value = "OFF"; 
+}
+function checkDblClick(my_msg) {
+	if (canSubmit() == false) {	// It should not re-submit while the request is processing.
+		if (my_msg != null)
+			alert(my_msg);
+		return false;
+	}
+	disableSubmit();
+	return true;
+}
+function checkDblClickPlusTimeout(my_msg) {	
+	if (canSubmit() == false) {
+		if (my_msg != null)
+			alert(my_msg);
+		return false;
+	}
+	disableSubmit();
+	startTimer();
+	return true;
+}
+function restartTimer() {
+	window.clearTimeout(timerId);
+	timerId = window.setTimeout("restartTimer()",5000);
+	enableSubmit();
+}
+function startTimer(timeout) {
+	my_timeout = timeout
+	timerId = window.setTimeout("restartTimer()",5000);
+	return true;	 
+}
+function verify() {	
+   if (courseListForm.lang.value == "T") {
+		if (checkDblClickPlusTimeout("กรุณารอสักครู่ !") == false) {	
+			return false;
+		} else {  
+			document.forms[0].activestatus.value = "OFF";		
+			return true;
+		}
+	} else {
+		if (checkDblClickPlusTimeout("Please wait a moment !") == false) {	
+			return false;
+		} else {  
+			document.forms[0].activestatus.value = "OFF";		
+			return true;
+		}
+	}
+}
+function Blank(){
+}
+/*
+function Post(value){
+	studentListForm.studentid.value = value;
+	window.alert("Thank you for stopping= "+value);
+	studentListForm.submit();
+}*/
+function reset() {
+	if (parent.frames.length > 1) {
+		parent.frames[0].document.forms[0].activestatus.value = "ON";
+	}
+	if (courseListForm.defaulturl.value.length > 0)
+		document.open(courseListForm.defaulturl.value,"cs_right","") ;
+	startTimer(5000);
+}
+function verify(){
+	if (document.forms[0].activestatus.value == "ON")	{
+		document.forms[0].activestatus.value = "OFF";
+		return true;
+	} else {
+		alert("กรุณารอสักครู่ !");
+		return false;
+	}
+}
+</script>
+<BASE TARGET="_parent">
+</HEAD>
+<BODY BGCOLOR="#FFFFFF"  LINK="#000099" VLINK="#6F00A4" TEXT="#000000" TOPMARGIN=2 LEFTMARGIN=2 MARGINWIDTH=2 MARGINHEIGHT=2 onLoad="reset();">
+
+
+
+
+<FORM NAME="courseListForm" METHOD="GET"  ACTION="" target="cs_right" >
+	
+  <TABLE BORDER=0 CELLSPACING=0 CELLPADDING=0 >
+	  <TR VALIGN=TOP ALIGN=LEFT>
+      <TD WIDTH=0 HEIGHT=2><IMG SRC="/backoffice/images/clearpixel.gif" WIDTH=0 HEIGHT=1 BORDER=0></TD>
+      <TD></TD>
+	  </TR>
+    <TR VALIGN=TOP ALIGN=LEFT>
+      <TD></TD>
+      <TD WIDTH=167>
+        <TABLE ID="Table5" BORDER=0 CELLSPACING=0 CELLPADDING=8 WIDTH=167>
+          <TR>
+					      
+				    <TD WIDTH=150 BGCOLOR="#FFCCFF" ALIGN=CENTER><NOBR><FONT COLOR="#0000FF" SIZE="+1" FACE="MS Sans Serif"> รายวิชาที่พบ</FONT></NOBR></TD>
+					
+          </TR>
+        </TABLE>
+      </TD>
+    </TR>
+    </TABLE>
+    <TABLE BORDER=0 CELLSPACING=0 CELLPADDING=0 WIDTH=194 >
+      <TR VALIGN=TOP ALIGN=LEFT>
+        <TD WIDTH=182><IMG SRC="/backoffice/images/clearpixel.gif" WIDTH=182 HEIGHT=1 BORDER=0></TD>
+      </TR>
+      <TR VALIGN=TOP ALIGN=LEFT>
+			      
+				<TD WIDTH=182><NOBR><FONT COLOR="#0000FF" SIZE="-1" FACE="MS Sans Serif">กด</FONT><FONT SIZE="-1" FACE="MS Sans Serif"> </FONT><FONT COLOR="#000099" SIZE="-1" FACE="MS Sans Serif"><U>รหัสรายวิชา</U></FONT><FONT SIZE="-1"
+				FACE="MS Sans Serif"> </FONT><FONT COLOR="#0000FF" SIZE="-1" FACE="MS Sans Serif">เพื่อดูรายละเอียด</FONT></NOBR></TD>
+			
+      </TR>
+    </TABLE>
+		
+    <TABLE ID="Table4" BORDER=0 CELLSPACING=0 CELLPADDING=0 WIDTH=199>
+		  
+		  <TR>
+  		
+			
+				<TD WIDTH=5></TD>
+				<TD WIDTH=54  ALIGN=LEFT><NOBR>
+				<A HREF=/servlet/com.dtm.chula.cs.servlet.QueryCourseScheduleNew.CourseScheduleDtlNewServlet?courseNo=5500111&studyProgram=S NAME="submit" TITLE=5500111 TARGET="cs_right" OnClick="return verify();">
+				<FONT SIZE="-1" FACE="MS Sans Serif">5500111</FONT></A>
+				<FONT SIZE="-1" FACE="MS Sans Serif"></FONT></NOBR></TD>
+			      
+				<TD WIDTH=139 ALIGN=LEFT><NOBR><FONT COLOR="#660000" SIZE="-2" FACE="MS Sans Serif">&nbsp;&nbsp;EXP ENG I</FONT></NOBR></TD>
+			
+			</TR>
+		  
+		  <TR>
+  		
+			
+				<TD WIDTH=5></TD>
+				<TD WIDTH=54  ALIGN=LEFT><NOBR>
+				<A HREF=/servlet/com.dtm.chula.cs.servlet.QueryCourseScheduleNew.CourseScheduleDtlNewServlet?courseNo=5500123&studyProgram=S NAME="submit" TITLE=5500123 TARGET="cs_right" OnClick="return verify();">
+				<FONT SIZE="-1" FACE="MS Sans Serif">5500123</FONT></A>
+				<FONT SIZE="-1" FACE="MS Sans Serif"></FONT></NOBR></TD>
+			      
+				<TD WIDTH=139 ALIGN=LEFT><NOBR><FONT COLOR="#660000" SIZE="-2" FACE="MS Sans Serif">&nbsp;&nbsp;FOUND ENG MED I</FONT></NOBR></TD>
+			
+			</TR>
+		  
+		  <TR>
+  		
+			
+				<TD WIDTH=5></TD>
+				<TD WIDTH=54  ALIGN=LEFT><NOBR>
+				<A HREF=/servlet/com.dtm.chula.cs.servlet.QueryCourseScheduleNew.CourseScheduleDtlNewServlet?courseNo=5500193&studyProgram=S NAME="submit" TITLE=5500193 TARGET="cs_right" OnClick="return verify();">
+				<FONT SIZE="-1" FACE="MS Sans Serif">5500193</FONT></A>
+				<FONT SIZE="-1" FACE="MS Sans Serif"></FONT></NOBR></TD>
+			      
+				<TD WIDTH=139 ALIGN=LEFT><NOBR><FONT COLOR="#660000" SIZE="-2" FACE="MS Sans Serif">&nbsp;&nbsp;GRAMMAR/WRITING</FONT></NOBR></TD>
+			
+			</TR>
+		  
+		  <TR>
+  		
+			
+				<TD WIDTH=5></TD>
+				<TD WIDTH=54  ALIGN=LEFT><NOBR>
+				<A HREF=/servlet/com.dtm.chula.cs.servlet.QueryCourseScheduleNew.CourseScheduleDtlNewServlet?courseNo=5500194&studyProgram=S NAME="submit" TITLE=5500194 TARGET="cs_right" OnClick="return verify();">
+				<FONT SIZE="-1" FACE="MS Sans Serif">5500194</FONT></A>
+				<FONT SIZE="-1" FACE="MS Sans Serif"></FONT></NOBR></TD>
+			      
+				<TD WIDTH=139 ALIGN=LEFT><NOBR><FONT COLOR="#660000" SIZE="-2" FACE="MS Sans Serif">&nbsp;&nbsp;LISTEN ENG</FONT></NOBR></TD>
+			
+			</TR>
+		  
+    </TABLE>
+  <INPUT TYPE="hidden" NAME="activestatus" VALUE="ON">
+  <INPUT TYPE="hidden" NAME="defaulturl" VALUE=>
+</FORM>
+</BODY>
+</HTML>
