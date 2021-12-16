@@ -3,12 +3,10 @@ import clsx from 'clsx'
 import { makeStyles } from '@material-ui/core/styles'
 import Grid from '@material-ui/core/Grid'
 import Hidden from '@material-ui/core/Hidden'
-import Divider from '@material-ui/core/Divider'
 import IconButton from '@material-ui/core/IconButton'
 import MenuIcon from '@material-ui/icons/Menu'
 import SearchIcon from '@material-ui/icons/Search'
 import LibraryBooksIcon from '@material-ui/icons/LibraryBooks'
-import ChevronLeftIcon from '@material-ui/icons/ChevronLeft'
 
 import Header from './Header'
 
@@ -43,21 +41,6 @@ const useStyles = makeStyles((theme) => ({
       marginRight: -theme.spacing(1.5),
     },
   },
-  vertDivider: {
-    margin: theme.spacing(0, 1),
-  },
-  sidebarIconButton: {
-    [theme.breakpoints.up('lg')]: {
-      marginRight: -theme.spacing(1.5),
-    },
-    '& svg': {
-      transition: 'transform 0.5s',
-    },
-  },
-  flipIcon: {
-    transform: 'rotate(-180deg)',
-    '-webkit-transform': 'rotate(-180deg)',
-  },
 }))
 
 export interface MainAppBarProps extends React.ComponentPropsWithoutRef<'main'> {
@@ -68,7 +51,6 @@ export interface MainAppBarProps extends React.ComponentPropsWithoutRef<'main'> 
   onMenuClick: () => void
   onShowPresets: () => void
   onFindCourse: () => void
-  onSidebarStateChange: (open: boolean) => void
 }
 
 const MainAppBar = ({
@@ -79,7 +61,6 @@ const MainAppBar = ({
   onMenuClick,
   onShowPresets,
   onFindCourse,
-  onSidebarStateChange,
   className,
   children,
   ...props
@@ -125,19 +106,6 @@ const MainAppBar = ({
       >
         <LibraryBooksIcon />
       </IconButton>
-      <Hidden mdDown>
-        <Divider orientation="vertical" flexItem className={classes.vertDivider} />
-        <IconButton
-          color="inherit"
-          aria-label="show-course-detail"
-          title={showSidebar ? 'Hide course detail' : 'Show course detail'}
-          disabled={disableActions}
-          onClick={() => onSidebarStateChange(!showSidebar)}
-          className={classes.sidebarIconButton}
-        >
-          <ChevronLeftIcon className={clsx({ [classes.flipIcon]: showSidebar })} />
-        </IconButton>
-      </Hidden>
     </Grid>
   )
 

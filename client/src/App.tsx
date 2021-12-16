@@ -159,7 +159,6 @@ const App = () => {
   const [loadingMessage, setLoadingMessage] = useState('Initializing...')
   const [showNav, setShowNav] = useState(false)
   const [showCourseFinder, setShowCourseFinder] = useState(false)
-  const [showSidebar, setShowSidebar] = useState(true)
   const [presets, fetchPresets] = usePresets()
   const [appState, setAppState] = useState<AppState | null>(null)
   const { fetchCourse } = useCourseManager(appState, setAppState)
@@ -233,7 +232,6 @@ const App = () => {
 
   const handleViewCourse = (code: string) => {
     setAppState((state) => rd.viewCourse(state, code))
-    setShowSidebar(true)
   }
 
   const handleViewRenewedCourse = useCallback((code: string) => {
@@ -412,11 +410,10 @@ const App = () => {
             {courseDetail}
           </Container>
         )}
-        showSidebar={showSidebar && !!appState}
+        showSidebar={!!appState}
         onMenuClick={() => setShowNav(true)}
         onFindCourse={() => setShowCourseFinder(true)}
         onShowPresets={showDialog.presetList}
-        onSidebarStateChange={setShowSidebar}
         disableActions={!appState}
       >
         {children}
