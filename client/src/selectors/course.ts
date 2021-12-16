@@ -2,6 +2,17 @@ import { createSelector } from 'reselect'
 
 import { AppState, Course } from '../models'
 
+export const selectCourseCodes = createSelector(
+  (appState: AppState) => appState.preset.courses,
+  (appState: AppState) => appState.viewCourseCode,
+  (courses, viewCourseCode) => {
+    if (!viewCourseCode) {
+      return courses
+    }
+    return [...courses, viewCourseCode]
+  },
+)
+
 export const selectCoursesWithData = createSelector(
   (appState: AppState) => appState.preset.courses,
   (appState: AppState) => appState.courseData,

@@ -9,3 +9,10 @@ export const range = <T extends any>(
   }
   return result
 }
+
+export const stringifyValues = <T extends object>(o: T) => Object
+  .entries(o)
+  .reduce((acc, [k, v]) => {
+    acc[k as keyof T] = String(v)
+    return acc
+  }, {} as Record<keyof T, string>)

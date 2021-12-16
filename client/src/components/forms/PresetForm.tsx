@@ -86,6 +86,7 @@ const SemesterSelect = createTextField({
 const AcadyearField = createTextField({
   name: 'acadyear',
   label: 'Year (AD)',
+  type: 'number',
   fullWidth: true,
   autoComplete: 'off',
 })

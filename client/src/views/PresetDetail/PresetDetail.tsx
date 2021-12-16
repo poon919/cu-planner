@@ -39,7 +39,7 @@ const useStyles = makeStyles((theme) => ({
 
 const PresetDetail = ({
   appState,
-  onRefresh,
+  onRefreshAll,
   onViewCourse,
   onDeleteCourse,
   onEditPreset,
@@ -62,10 +62,6 @@ const PresetDetail = ({
     }
     return acc
   }, [0, Number.MAX_VALUE] as [number, number])
-
-  const handleRefreshAll = () => {
-    courses.forEach((code) => onRefresh(code))
-  }
 
   const classes = useStyles()
 
@@ -114,7 +110,7 @@ const PresetDetail = ({
             <IconButton
               aria-label="refresh-courses"
               title="Refresh all courses"
-              onClick={handleRefreshAll}
+              onClick={onRefreshAll}
             >
               <RefreshIcon fontSize="small" />
             </IconButton>

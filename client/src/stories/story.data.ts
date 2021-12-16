@@ -39,6 +39,7 @@ export const TestAppState: AppState = {
       [Courses[0].code]: { section: '1-150', keyword: '' },
     },
   },
+  viewCourseCode: '',
   courseData: {
     ...Courses.reduce((acc, course) => {
       acc[course.code] = { type: 'success', data: course, timestamp: new Date() }
@@ -59,6 +60,7 @@ export const EmptyAppState: AppState = {
     courses: [],
     filters: {},
   },
+  viewCourseCode: '',
   courseData: {},
 }
 

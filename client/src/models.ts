@@ -9,6 +9,7 @@ export type ValidSemestersFetchState = FetchState<string[]>
 
 export interface AppState {
   preset: Preset
+  viewCourseCode: string
   courseData: Record<string, CourseFetchState | undefined>
 }
 

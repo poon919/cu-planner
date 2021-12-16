@@ -5,6 +5,7 @@ import Grid from '@material-ui/core/Grid'
 import Alert from '@material-ui/lab/Alert'
 
 import { PresetInfo, Program, Semester } from '../../models'
+import { stringifyValues } from '../../utils'
 import PresetForm, { useManagedForm } from '../../components/forms/PresetForm'
 import {
   Dialog,
@@ -67,12 +68,7 @@ const PresetFormDialog = ({
   } = dialogVariants[variant || 'default']
 
   const { form } = useManagedForm({
-    defaultValues: defaultValues && ({
-      name: defaultValues.name,
-      program: defaultValues.program,
-      acadyear: defaultValues.acadyear.toString(),
-      semester: defaultValues.semester,
-    }),
+    defaultValues: defaultValues && stringifyValues(defaultValues),
   })
 
   const {

@@ -7,7 +7,7 @@ import {
   Timetable,
 } from '../models'
 import { DEFAULT_FILTER } from '../const'
-import { splitFilter, parseSectionFilter } from '../utils/filter'
+import { splitFilter, parseSectionFilter } from '../utils'
 import { createSelectorMappingMemo } from './creator'
 
 /**

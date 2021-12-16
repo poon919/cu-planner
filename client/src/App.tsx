@@ -17,8 +17,8 @@ import DateRangeIcon from '@material-ui/icons/DateRange'
 
 import * as api from './api'
 import * as db from './db'
+import * as rd from './reducers'
 import * as sels from './selectors'
-import * as utils from './utils'
 import {
   AppState,
   PresetInfo,
@@ -62,6 +62,40 @@ const usePresets = () => {
   const fetchPresets = () => db.getAllPresetInfo().then(setPresets)
 
   return [presets, fetchPresets] as const
+}
+
+const useCourseManager = (
+  appState: AppState | null,
+  setAppState: React.Dispatch<React.SetStateAction<AppState | null>>,
+) => {
+  const courseCodes = appState ? sels.selectCourseCodes(appState) : null
+
+  const fetchCourse = async (preset: PresetInfo, code: string, renew: boolean) => {
+    setAppState((state) => rd.setCourseData(state, code, { type: 'fetching' }, preset))
+    const result = await api.fetchCourse(preset, code, renew)
+    setAppState((state) => rd.setCourseData(state, code, result, preset))
+  }
+
+  useEffect(() => {
+    if (!appState) {
+      return
+    }
+    const codes = new Set(courseCodes)
+
+    Object.keys(appState.courseData).forEach((code) => {
+      if (!codes.delete(code)) {
+        setAppState((state) => rd.deleteCourseData(state, code))
+      }
+    })
+
+    codes.forEach((code) => {
+      fetchCourse(appState.preset, code, true)
+    })
+  }, [courseCodes])
+
+  return {
+    fetchCourse,
+  }
 }
 
 const useStyles = makeStyles((theme) => ({
@@ -126,9 +160,9 @@ const App = () => {
   const [showNav, setShowNav] = useState(false)
   const [showCourseFinder, setShowCourseFinder] = useState(false)
   const [showSidebar, setShowSidebar] = useState(true)
-  const [curCourseCode, setCurCourseCode] = useState('')
   const [presets, fetchPresets] = usePresets()
   const [appState, setAppState] = useState<AppState | null>(null)
+  const { fetchCourse } = useCourseManager(appState, setAppState)
   const {
     dialog,
     showDialog,
@@ -136,52 +170,22 @@ const App = () => {
   } = useDialog()
 
   const presetInfo = appState ? sels.selectPresetInfo(appState.preset) : null
-  const courseData = appState ? appState.courseData : {}
 
   const loadPreset = async (id: number) => {
     const preset = await db.getPreset(id)
     if (!preset) {
+      setAppState(null)
       return
     }
+
     db.setLastPresetID(id)
-    setAppState((state) => ({
+    setAppState({
       preset,
-      courseData: state?.courseData || {},
-    }))
+      viewCourseCode: '',
+      courseData: {},
+    })
     closeDialog()
   }
-
-  const fetchCourse = useCallback(async (code: string, renew = true) => {
-    if (!presetInfo) {
-      return
-    }
-    setAppState((state) => {
-      if (!state || presetInfo !== sels.selectPresetInfo(state.preset)) {
-        return state
-      }
-      return {
-        ...state,
-        courseData: { ...state.courseData, [code]: { type: 'fetching' } },
-      }
-    })
-    const result = await api.fetchCourse(presetInfo, code, renew)
-    setAppState((state) => {
-      if (!state || presetInfo !== sels.selectPresetInfo(state.preset)) {
-        return state
-      }
-      return {
-        ...state,
-        courseData: { ...state.courseData, [code]: result },
-      }
-    })
-  }, [presetInfo])
-
-  const forceShowSidebar = useCallback(<T extends (...args: any) => any>(
-    callback: T,
-  ) => (...args: Parameters<T>): ReturnType<T> => {
-      setShowSidebar(true)
-      return callback(...args)
-    }, [])
 
   useEffect(() => {
     const init = async () => {
@@ -200,14 +204,6 @@ const App = () => {
       setLoadingMessage('')
     }
   }, [firstLoaded, appState])
-
-  useEffect(() => {
-    if (appState) {
-      setCurCourseCode('')
-      setAppState({ ...appState, courseData: {} })
-      appState.preset.courses.forEach((code) => fetchCourse(code, false))
-    }
-  }, [presetInfo])
 
   const handleRoute = (path: string) => {
     history.push(path)
@@ -235,33 +231,21 @@ const App = () => {
     }
   }
 
-  const viewCourse = useCallback((renew: boolean) => async (code: string) => {
-    setCurCourseCode(code)
-    if (!renew && courseData[code]) {
+  const handleViewCourse = (code: string) => {
+    setAppState((state) => rd.viewCourse(state, code))
+    setShowSidebar(true)
+  }
+
+  const handleViewRenewedCourse = useCallback((code: string) => {
+    if (!presetInfo) {
       return
     }
-    await fetchCourse(code, renew)
-  }, [courseData, fetchCourse])
-
-  const handleViewCourse = useCallback(viewCourse(false), [viewCourse])
-  const handleForceViewCourse = useCallback(
-    forceShowSidebar(handleViewCourse),
-    [forceShowSidebar, handleViewCourse],
-  )
-  const handleForceViewRenewedCourse = useCallback(
-    forceShowSidebar(viewCourse(true)),
-    [forceShowSidebar, viewCourse],
-  )
+    handleViewCourse(code)
+    fetchCourse(presetInfo, code, true)
+  }, [presetInfo])
 
   const handleDeselectCourse = () => {
-    setCurCourseCode('')
-    setAppState((state) => {
-      if (!state || state.preset.courses.indexOf(curCourseCode) >= 0) {
-        return state
-      }
-      const { [curCourseCode]: deleted, ...others } = state.courseData
-      return { ...state, courseData: others }
-    })
+    setAppState((state) => rd.viewCourse(state, ''))
   }
 
   const handleDeleteCourse = async (code: string) => {
@@ -269,16 +253,7 @@ const App = () => {
       return
     }
     const preset = await db.deletePresetCourse(presetInfo.id, code)
-    setAppState((state) => {
-      if (!state) {
-        return null
-      }
-      if (curCourseCode === code) {
-        return { ...state, preset }
-      }
-      const { [code]: deleted, ...others } = state.courseData
-      return { preset, courseData: others }
-    })
+    setAppState((state) => rd.setPreset(state, preset))
   }
 
   const handleAddCourse = useCallback(async (code: string, filter?: CourseFilter) => {
@@ -287,11 +262,14 @@ const App = () => {
     }
     const preset = await db.addPresetCourse(presetInfo.id, code, filter)
     setAppState((state) => state && { ...state, preset })
-    if (courseData[code]) {
+  }, [presetInfo])
+
+  const handleRefreshAll = () => {
+    if (!appState) {
       return
     }
-    await fetchCourse(code, false)
-  }, [presetInfo, courseData, fetchCourse])
+    appState.preset.courses.forEach((code) => fetchCourse(appState.preset, code, true))
+  }
 
   const handleFilterCourse = useCallback((code: string, filter: CourseFilter) => {
     if (!presetInfo) {
@@ -299,7 +277,7 @@ const App = () => {
     }
     // Don't use await here because it may cause UI freeze
     db.updatePresetFilters(presetInfo.id, { [code]: filter })
-    setAppState((state) => utils.updateAppFilter(state, code, filter))
+    setAppState((state) => rd.updateAppFilter(state, code, filter))
   }, [presetInfo])
 
   const classes = useStyles()
@@ -312,7 +290,7 @@ const App = () => {
     <CourseFinder
       key={presetKey}
       appState={appState}
-      onViewCourse={handleForceViewRenewedCourse}
+      onViewCourse={handleViewRenewedCourse}
       onAddCourse={handleAddCourse}
       onDeleteCourse={handleDeleteCourse}
       className={classes.drawerChild}
@@ -322,7 +300,7 @@ const App = () => {
   const courseDetail = !!appState && (
     <CourseDetail
       key={presetKey}
-      code={curCourseCode}
+      code={appState.viewCourseCode}
       appState={appState}
       onFilterChange={handleFilterCourse}
       onAddCourse={handleAddCourse}
@@ -351,8 +329,8 @@ const App = () => {
             <Route exact path="/">
               <PresetDetail
                 appState={appState}
-                onRefresh={fetchCourse}
-                onViewCourse={handleForceViewCourse}
+                onRefreshAll={handleRefreshAll}
+                onViewCourse={handleViewCourse}
                 onDeleteCourse={handleDeleteCourse}
                 onEditPreset={showDialog.presetEditor}
                 onExportPreset={showDialog.presetExporter}
@@ -392,7 +370,7 @@ const App = () => {
           <DrawerWithHeader
             variant="temporary"
             anchor="right"
-            open={!!curCourseCode}
+            open={!!appState.viewCourseCode}
             onClose={handleDeselectCourse}
             PaperProps={{ className: classes.courseDetailPaper }}
           >

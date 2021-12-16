@@ -27,7 +27,7 @@ const useCommonProps = (initState: AppState) => {
   return {
     appState,
     onDeleteCourse: handleDeleteCourse,
-    ...actions('onRefresh', 'onViewCourse', 'onEditPreset', 'onExportPreset'),
+    ...actions('onRefreshAll', 'onViewCourse', 'onEditPreset', 'onExportPreset'),
   }
 }
 
