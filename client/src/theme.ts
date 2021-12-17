@@ -1,6 +1,12 @@
 import { createMuiTheme, responsiveFontSizes } from '@material-ui/core/styles'
 import { grey } from '@material-ui/core/colors'
 
+declare module '@material-ui/core/styles/createBreakpoints' {
+  interface BreakpointOverrides {
+    desktop: true;
+  }
+}
+
 declare module '@material-ui/core/styles/createPalette' {
   interface Palette {
     border: {
@@ -55,6 +61,16 @@ export default responsiveFontSizes(createMuiTheme({
           },
         },
       },
+    },
+  },
+  breakpoints: {
+    values: {
+      xs: 0,
+      sm: 600,
+      md: 960,
+      lg: 1280,
+      xl: 1920,
+      desktop: 1280,
     },
   },
   mixins: {

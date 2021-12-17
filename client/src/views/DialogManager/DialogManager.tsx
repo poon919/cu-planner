@@ -1,8 +1,8 @@
 import React, { useState } from 'react'
 
 import * as db from '../../db'
-import { useValidSemester } from '../../api'
 import { PresetInfo, Preset } from '../../models'
+import { useValidSemester } from '../../hooks'
 import ExportDialog from '../dialogs/ExportDialog'
 import ImportDialog from '../dialogs/ImportDialog'
 import PresetFormDialog from '../dialogs/PresetFormDialog'

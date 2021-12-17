@@ -1,4 +1,8 @@
-import { useRef, useEffect } from 'react'
+import { useState, useRef, useEffect } from 'react'
+import { Theme } from '@material-ui/core/styles'
+import useMediaQuery from '@material-ui/core/useMediaQuery'
+
+import { fetchValidSemesters } from './api'
 
 // ref: https://usehooks.com/usePrevious/
 export const usePrevious = <T>(value: T): T => {
@@ -11,4 +15,23 @@ export const usePrevious = <T>(value: T): T => {
   }, [value]) // Only re-run if value changes
   // Return previous value (happens before update in useEffect above)
   return ref.current
+}
+
+export const useValidSemester = () => {
+  const [validSemesters, setValidSemesters] = useState<string[]>()
+
+  useEffect(() => {
+    const init = async () => {
+      const result = await fetchValidSemesters()
+      setValidSemesters(result.type === 'success' ? result.data : undefined)
+    }
+    init()
+  }, [])
+
+  return validSemesters
+}
+
+export const useDesktop = () => {
+  const onDesktop = useMediaQuery((theme: Theme) => theme.breakpoints.up('desktop'))
+  return onDesktop
 }

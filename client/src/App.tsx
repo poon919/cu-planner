@@ -4,13 +4,13 @@ import {
   Route,
   Redirect,
   useHistory,
+  useRouteMatch,
 } from 'react-router-dom'
+import clsx from 'clsx'
 import { makeStyles } from '@material-ui/core/styles'
 import CssBaseline from '@material-ui/core/CssBaseline'
 import Container from '@material-ui/core/Container'
 import Hidden from '@material-ui/core/Hidden'
-import Drawer from '@material-ui/core/Drawer'
-import Typography from '@material-ui/core/Typography'
 import LibraryBooksIcon from '@material-ui/icons/LibraryBooks'
 import ScheduleIcon from '@material-ui/icons/Schedule'
 import DateRangeIcon from '@material-ui/icons/DateRange'
@@ -24,24 +24,27 @@ import {
   PresetInfo,
   CourseFilter,
 } from './models'
+import { useDesktop } from './hooks'
 import LoadingSnackbar from './components/LoadingSnackbar'
 import DrawerWithHeader from './components/DrawerWithHeader'
-import MainAppBar from './components/MainAppBar'
-import RouteList from './components/RouteList'
+import MainAppBar from './views/MainAppBar'
 import PresetDetail from './views/PresetDetail'
 import PlannerTable from './views/PlannerTable'
 import ExamTable from './views/ExamTable'
 import CourseFinder from './views/CourseFinder'
 import CourseDetail from './views/CourseDetail'
-import DialogManager, { useDialog, PresetUpdateAction } from './views/DialogManager'
 import Welcome from './views/Welcome'
+import DialogManager, {
+  useDialog,
+  PresetUpdateAction,
+} from './views/DialogManager'
 
 const routes = [
   {
-    key: 'mycourses',
-    path: '/',
+    key: 'courses',
+    path: '/courses',
     icon: LibraryBooksIcon,
-    text: { primary: 'My Courses' },
+    text: { primary: 'Courses' },
   },
   {
     key: 'timetable',
@@ -56,46 +59,13 @@ const routes = [
     text: { primary: 'Exam' },
   },
 ]
+const findCourseRoute = '/find'
 
 const usePresets = () => {
   const [presets, setPresets] = useState<PresetInfo[]>([])
   const fetchPresets = () => db.getAllPresetInfo().then(setPresets)
 
   return [presets, fetchPresets] as const
-}
-
-const useCourseManager = (
-  appState: AppState | null,
-  setAppState: React.Dispatch<React.SetStateAction<AppState | null>>,
-) => {
-  const courseCodes = appState ? sels.selectCourseCodes(appState) : null
-
-  const fetchCourse = async (preset: PresetInfo, code: string, renew: boolean) => {
-    setAppState((state) => rd.setCourseData(state, code, { type: 'fetching' }, preset))
-    const result = await api.fetchCourse(preset, code, renew)
-    setAppState((state) => rd.setCourseData(state, code, result, preset))
-  }
-
-  useEffect(() => {
-    if (!appState) {
-      return
-    }
-    const codes = new Set(courseCodes)
-
-    Object.keys(appState.courseData).forEach((code) => {
-      if (!codes.delete(code)) {
-        setAppState((state) => rd.deleteCourseData(state, code))
-      }
-    })
-
-    codes.forEach((code) => {
-      fetchCourse(appState.preset, code, true)
-    })
-  }, [courseCodes])
-
-  return {
-    fetchCourse,
-  }
 }
 
 const useStyles = makeStyles((theme) => ({
@@ -105,46 +75,22 @@ const useStyles = makeStyles((theme) => ({
     marginBottom: theme.spacing(1),
     overflowX: 'auto',
   },
-  appTitle: {
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderBottom: `1px solid ${theme.palette.divider}`,
-    ...theme.mixins.toolbar,
-  },
   main: {
-    [theme.breakpoints.up('lg')]: {
+    [theme.breakpoints.up('desktop')]: {
       paddingRight: theme.spacing(1.5),
     },
-  },
-  navContainer: {
-    width: 250,
-    maxWidth: '80%',
   },
   sidebarContainer: {
     paddingLeft: theme.spacing(1.5),
   },
-  courseFinderDrawer: {
-    [theme.breakpoints.up('lg')]: {
-      width: '66%',
-    },
-  },
-  courseFinderPaper: {
-    [theme.breakpoints.up('lg')]: {
-      width: '66%',
-    },
-    [theme.breakpoints.only('md')]: {
-      width: '85%',
-    },
-    [theme.breakpoints.down('sm')]: {
-      width: '100%',
-    },
+  hidden: {
+    display: 'none',
   },
   courseDetailPaper: {
-    [theme.breakpoints.only('md')]: {
+    [theme.breakpoints.up('sm')]: {
       width: '80%',
     },
-    [theme.breakpoints.down('sm')]: {
+    [theme.breakpoints.down('xs')]: {
       width: '100%',
     },
   },
@@ -155,13 +101,12 @@ const useStyles = makeStyles((theme) => ({
 
 const App = () => {
   const history = useHistory()
+  const showCourseFinder = !!useRouteMatch({ path: findCourseRoute, strict: true })
   const [firstLoaded, setFirstLoaded] = useState(false)
   const [loadingMessage, setLoadingMessage] = useState('Initializing...')
-  const [showNav, setShowNav] = useState(false)
-  const [showCourseFinder, setShowCourseFinder] = useState(false)
   const [presets, fetchPresets] = usePresets()
   const [appState, setAppState] = useState<AppState | null>(null)
-  const { fetchCourse } = useCourseManager(appState, setAppState)
+  const onDesktop = useDesktop()
   const {
     dialog,
     showDialog,
@@ -169,6 +114,13 @@ const App = () => {
   } = useDialog()
 
   const presetInfo = appState ? sels.selectPresetInfo(appState.preset) : null
+  const courseCodes = appState ? sels.selectCourseCodes(appState) : null
+
+  const fetchCourse = async (preset: PresetInfo, code: string, renew: boolean) => {
+    setAppState((state) => rd.setCourseData(state, code, { type: 'fetching' }, preset))
+    const result = await api.fetchCourse(preset, code, renew)
+    setAppState((state) => rd.setCourseData(state, code, result, preset))
+  }
 
   const loadPreset = async (id: number) => {
     const preset = await db.getPreset(id)
@@ -204,9 +156,29 @@ const App = () => {
     }
   }, [firstLoaded, appState])
 
+  useEffect(() => {
+    if (!appState) {
+      return
+    }
+    const codes = new Set(courseCodes)
+
+    Object.keys(appState.courseData).forEach((code) => {
+      if (!codes.delete(code)) {
+        setAppState((state) => rd.deleteCourseData(state, code))
+      }
+    })
+
+    codes.forEach((code) => {
+      fetchCourse(appState.preset, code, true)
+    })
+  }, [courseCodes])
+
   const handleRoute = (path: string) => {
     history.push(path)
-    setShowNav(false)
+  }
+
+  const handleFindCourseClick = () => {
+    history.push(findCourseRoute)
   }
 
   const handlePresetUpdated = async (id: number, action: PresetUpdateAction) => {
@@ -284,17 +256,6 @@ const App = () => {
     ? `${presetInfo.id}${presetInfo.program}${presetInfo.acadyear}${presetInfo.semester}`
     : ''
 
-  const courseFinder = !!appState && (
-    <CourseFinder
-      key={presetKey}
-      appState={appState}
-      onViewCourse={handleViewRenewedCourse}
-      onAddCourse={handleAddCourse}
-      onDeleteCourse={handleDeleteCourse}
-      className={classes.drawerChild}
-    />
-  )
-
   const courseDetail = !!appState && (
     <CourseDetail
       key={presetKey}
@@ -324,7 +285,7 @@ const App = () => {
       <div className={classes.scrollPort}>
         <Container maxWidth={false} className={classes.main}>
           <Switch>
-            <Route exact path="/">
+            <Route path="/courses">
               <PresetDetail
                 appState={appState}
                 onRefreshAll={handleRefreshAll}
@@ -334,37 +295,34 @@ const App = () => {
                 onExportPreset={showDialog.presetExporter}
               />
             </Route>
-            <Route exact path="/timetable">
+            <Route path="/timetable">
               <PlannerTable
                 appState={appState}
                 onFilterChange={handleFilterCourse}
                 onViewCourse={handleViewCourse}
               />
             </Route>
-            <Route exact path="/exam">
+            <Route path="/exam">
               <ExamTable
                 appState={appState}
                 onViewCourse={handleViewCourse}
               />
             </Route>
+            <Route path={findCourseRoute} />
             <Route path="*">
-              <Redirect to="/" />
+              <Redirect to="/courses" />
             </Route>
           </Switch>
+          <CourseFinder
+            key={presetKey}
+            appState={appState}
+            onViewCourse={handleViewRenewedCourse}
+            onAddCourse={handleAddCourse}
+            onDeleteCourse={handleDeleteCourse}
+            className={clsx({ [classes.hidden]: !showCourseFinder })}
+          />
         </Container>
         <Hidden lgUp>
-          <DrawerWithHeader
-            variant="temporary"
-            anchor="right"
-            open={showCourseFinder}
-            onClose={() => setShowCourseFinder(false)}
-            PaperProps={{ className: classes.courseFinderPaper }}
-            ModalProps={{ keepMounted: true }}
-          >
-            <Container maxWidth={false}>
-              {courseFinder}
-            </Container>
-          </DrawerWithHeader>
           <DrawerWithHeader
             variant="temporary"
             anchor="right"
@@ -374,25 +332,6 @@ const App = () => {
           >
             <Container maxWidth={false}>
               {courseDetail}
-            </Container>
-          </DrawerWithHeader>
-        </Hidden>
-        <Hidden mdDown>
-          <DrawerWithHeader
-            variant="temporary"
-            anchor="left"
-            open={showCourseFinder}
-            onClose={() => setShowCourseFinder(false)}
-            className={classes.courseFinderDrawer}
-            PaperProps={{ className: classes.courseFinderPaper }}
-            ModalProps={{
-              keepMounted: true,
-              hideBackdrop: true,
-              disableEnforceFocus: true,
-            }}
-          >
-            <Container maxWidth={false}>
-              {courseFinder}
             </Container>
           </DrawerWithHeader>
         </Hidden>
@@ -410,30 +349,15 @@ const App = () => {
             {courseDetail}
           </Container>
         )}
-        showSidebar={!!appState}
-        onMenuClick={() => setShowNav(true)}
-        onFindCourse={() => setShowCourseFinder(true)}
-        onShowPresets={showDialog.presetList}
+        showSidebar={onDesktop && !!appState}
+        routes={routes}
+        onRoute={handleRoute}
+        onFindCourseClick={handleFindCourseClick}
+        onShowPresetsClick={showDialog.presetList}
         disableActions={!appState}
       >
         {children}
       </MainAppBar>
-      <Drawer
-        variant="temporary"
-        anchor="left"
-        open={showNav}
-        onClose={() => setShowNav(false)}
-        PaperProps={{ className: classes.navContainer }}
-        ModalProps={{ keepMounted: true }}
-      >
-        <div className={classes.appTitle}>
-          <Typography variant="h6" color="textSecondary">CU Planner</Typography>
-        </div>
-        <RouteList
-          routes={routes}
-          onRoute={handleRoute}
-        />
-      </Drawer>
       <DialogManager
         dialog={dialog}
         presets={presets}

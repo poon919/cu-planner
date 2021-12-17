@@ -1,6 +1,7 @@
 import React from 'react'
 import clsx from 'clsx'
 import { makeStyles } from '@material-ui/core/styles'
+import Grid from '@material-ui/core/Grid'
 import AppBar from '@material-ui/core/AppBar'
 import Toolbar from '@material-ui/core/Toolbar'
 
@@ -8,6 +9,9 @@ const useStyles = makeStyles((theme) => ({
   toolbar: {
     display: 'flex',
     justifyContent: 'space-between',
+    '& > div': {
+      width: 'auto',
+    },
   },
   barOffset: theme.mixins.toolbar,
   content: {
@@ -50,12 +54,12 @@ const Header = ({
           className={clsx(classes.toolbar, toolbarClassName)}
           {...restToolbarProps}
         >
-          <div>
+          <Grid container item justify="flex-start" alignItems="center">
             {leftAction}
-          </div>
-          <div>
+          </Grid>
+          <Grid container item justify="flex-end" alignItems="center">
             {rightAction}
-          </div>
+          </Grid>
         </Toolbar>
       </AppBar>
       <div className={classes.barOffset} />

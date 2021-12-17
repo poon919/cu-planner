@@ -15,36 +15,26 @@ const examTimeToString = (t: RegTime) => {
   return `${utils.toDateString(start)} ${utils.toTimeString(start)}-${utils.toTimeString(end)}`
 }
 
-interface FlexGridProps extends React.ComponentPropsWithoutRef<typeof Grid> {
-  col1?: string
-  col2?: string
+interface RowProps extends React.ComponentPropsWithoutRef<typeof Grid> {
   loading?: boolean
 }
 
-const FlexGrid = ({
-  col1,
-  col2,
+const Row = ({
   loading,
+  children,
   ...props
-}: FlexGridProps) => {
-  const renderText = (text?: string) => (
-    <>
-      <Typography>{text}</Typography>
-      <Divider />
-    </>
-  )
-
-  return (
-    <Grid container spacing={1} {...props}>
-      <Grid item xs={12} sm={6} lg={12}>
-        {loading ? <Skeleton /> : renderText(col1)}
-      </Grid>
-      <Grid item xs={12} sm={6} lg={12}>
-        {loading ? <Skeleton /> : renderText(col2)}
-      </Grid>
-    </Grid>
-  )
-}
+}: RowProps) => (
+  <Grid item {...props}>
+    {loading
+      ? <Skeleton />
+      : (
+        <>
+          <Typography>{children}</Typography>
+          <Divider />
+        </>
+      )}
+  </Grid>
+)
 
 export interface CourseDescriptionProps extends React.ComponentPropsWithoutRef<typeof Grid> {
   data?: Course
@@ -54,39 +44,56 @@ const CourseDescription = ({
   data,
   ...props
 }: CourseDescriptionProps) => {
+  let children: React.ReactNode = null
+
   if (!data) {
-    return (
-      <Grid container spacing={1} {...props}>
-        <FlexGrid item col1="-" col2="-" />
-        <FlexGrid item col1="Credit: -" col2="Requirement: -" />
-        <FlexGrid item col1="Midterm: -" col2="Final: -" />
-      </Grid>
+    children = (
+      <>
+        <Row>-</Row>
+        <Row>-</Row>
+        <Row>Credit: -</Row>
+        <Row>Requirement: -</Row>
+        <Row>Midterm: -</Row>
+        <Row>Final: -</Row>
+      </>
+    )
+  } else {
+    const {
+      name,
+      faculty,
+      totalCredit,
+      creditDetail,
+      requirement,
+      exam,
+    } = data
+
+    children = (
+      <>
+        <Row>{`${name.th} (${name.en})`}</Row>
+        <Row>{faculty}</Row>
+        <Row>{`Credit: ${totalCredit} (${creditDetail})`}</Row>
+        <Row>{`Requirement: ${requirement}`}</Row>
+        <Row>{`Midterm: ${examTimeToString(exam.midterm)}`}</Row>
+        <Row>{`Final: ${examTimeToString(exam.final)}`}</Row>
+      </>
     )
   }
 
-  const {
-    name,
-    faculty,
-    totalCredit,
-    creditDetail,
-    requirement,
-    exam,
-  } = data
-
   return (
-    <Grid container spacing={1} {...props}>
-      <FlexGrid item col1={`${name.th} (${name.en})`} col2={faculty} />
-      <FlexGrid item col1={`Credit: ${totalCredit} (${creditDetail})`} col2={`Requirement: ${requirement}`} />
-      <FlexGrid item col1={`Midterm: ${examTimeToString(exam.midterm)}`} col2={`Final: ${examTimeToString(exam.final)}`} />
+    <Grid container direction="column" wrap="nowrap" spacing={1} {...props}>
+      {children}
     </Grid>
   )
 }
 
 export const CourseDescriptionSkeleton = (props: React.ComponentPropsWithoutRef<typeof Grid>) => (
-  <Grid container spacing={1} {...props}>
-    <FlexGrid item loading />
-    <FlexGrid item loading />
-    <FlexGrid item loading />
+  <Grid container direction="column" wrap="nowrap" spacing={1} {...props}>
+    <Row item loading />
+    <Row item loading />
+    <Row item loading />
+    <Row item loading />
+    <Row item loading />
+    <Row item loading />
   </Grid>
 )
 

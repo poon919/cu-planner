@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { makeStyles, Theme } from '@material-ui/core/styles'
-import useMediaQuery from '@material-ui/core/useMediaQuery'
+import { makeStyles } from '@material-ui/core/styles'
 import Alert from '@material-ui/lab/Alert'
 
 import { CourseFilter } from '../../models'
@@ -10,7 +9,7 @@ import {
   selectCourseColor,
 } from '../../selectors'
 import { parseSectionFilter, sectionSpansToText } from '../../utils'
-import { usePrevious } from '../../hooks'
+import { usePrevious, useDesktop } from '../../hooks'
 import Timetable, { EventRow } from '../../components/Timetable'
 import EventCell, { SectionGroupEvent } from './EventCell'
 import { SectionSpan, anySpanOverlap, isSpansEqual } from './utils'
@@ -50,7 +49,7 @@ export const PlannerTable = React.memo(({
   const [selected, setSelected] = useState('')
   const [preview, setPreview] = useState<Preview | null>(null)
   const prevSelected = usePrevious(selected)
-  const isLgUp = useMediaQuery((theme: Theme) => theme.breakpoints.up('lg'))
+  const onDesktop = useDesktop()
   const activeFilter = selectCourseFilter(selected, appState.preset.filters)
   const allCourses = selectCoursesWithData(appState)
 
@@ -128,7 +127,7 @@ export const PlannerTable = React.memo(({
     const { code, sectionFilter, secSpans } = event.metadata
 
     setSelected(code)
-    if (isLgUp) {
+    if (onDesktop) {
       onViewCourse(code)
     }
 
