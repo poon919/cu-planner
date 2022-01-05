@@ -169,7 +169,7 @@ const App = () => {
     })
 
     codes.forEach((code) => {
-      fetchCourse(appState.preset, code, true)
+      fetchCourse(appState.preset, code, false)
     })
   }, [courseCodes])
 
