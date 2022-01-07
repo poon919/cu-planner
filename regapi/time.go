@@ -10,6 +10,16 @@ import (
 	"time"
 )
 
+var loc *time.Location
+
+func init() {
+	var err error
+	loc, err = time.LoadLocation("Asia/Bangkok")
+	if err != nil {
+		loc = time.FixedZone("UTC+7", 7*60*60)
+	}
+}
+
 // ClassDay is used to store timetable's day
 type ClassDay string
 
@@ -193,10 +203,6 @@ func newExamTime(s string) ExamTime {
 		return fallback
 	}
 
-	loc, err := time.LoadLocation("Asia/Bangkok")
-	if err != nil {
-		loc = time.UTC
-	}
 	startDate := time.Date(year-543, month, day, start.Hour, start.Minute, 0, 0, loc)
 	endDate := time.Date(year-543, month, day, end.Hour, end.Minute, 0, 0, loc)
 	return ExamTime{
