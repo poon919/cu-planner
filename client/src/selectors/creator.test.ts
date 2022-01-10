@@ -3,11 +3,14 @@ import { createSelector } from 'reselect'
 import { createSelectorMappingMemo } from './creator'
 
 describe('Selector creator with memo feature', () => {
-  const selectNumberBase = createSelectorMappingMemo(() => createSelector(
-    (a: number) => a,
-    (a: number) => ({ value: a }),
-  ), 2)
-  const selectNumber = (a: number) => selectNumberBase(a.toString(), a)
+  const selectNumber = createSelectorMappingMemo(
+    () => createSelector(
+      (a: number) => a,
+      (a: number) => ({ value: a }),
+    ),
+    (a) => a.toString(),
+    2,
+  )
   const num1 = selectNumber(1)
   const num2 = selectNumber(2)
 

@@ -38,15 +38,28 @@ const Row = ({
 
 export interface CourseDescriptionProps extends React.ComponentPropsWithoutRef<typeof Grid> {
   data?: Course
+  loading?: boolean
 }
 
 const CourseDescription = ({
   data,
+  loading,
   ...props
 }: CourseDescriptionProps) => {
   let children: React.ReactNode = null
 
-  if (!data) {
+  if (loading) {
+    children = (
+      <>
+        <Row item loading />
+        <Row item loading />
+        <Row item loading />
+        <Row item loading />
+        <Row item loading />
+        <Row item loading />
+      </>
+    )
+  } else if (!data) {
     children = (
       <>
         <Row>-</Row>
@@ -85,16 +98,5 @@ const CourseDescription = ({
     </Grid>
   )
 }
-
-export const CourseDescriptionSkeleton = (props: React.ComponentPropsWithoutRef<typeof Grid>) => (
-  <Grid container direction="column" wrap="nowrap" spacing={1} {...props}>
-    <Row item loading />
-    <Row item loading />
-    <Row item loading />
-    <Row item loading />
-    <Row item loading />
-    <Row item loading />
-  </Grid>
-)
 
 export default CourseDescription

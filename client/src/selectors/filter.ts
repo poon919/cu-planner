@@ -56,21 +56,21 @@ const filterSections = (sections: Record<string, Section>, filter: CourseFilter)
   return filterByKeyword(filtered, filter.keyword)
 }
 
-const selectFilteredSectionsBase = createSelectorMappingMemo(() => createSelector(
-  (course: Course) => course.sections,
-  (_: Course, filters: CourseFilter) => filters.section,
-  (_: Course, filters: CourseFilter) => filters.keyword,
-  (sections, sectionFilter, keywordFilter) => filterSections(
-    sections,
-    {
-      section: sectionFilter,
-      keyword: keywordFilter,
-    },
+export const selectFilteredSections = createSelectorMappingMemo(
+  () => createSelector(
+    (course: Course) => course.sections,
+    (_: Course, filters: CourseFilter) => filters.section,
+    (_: Course, filters: CourseFilter) => filters.keyword,
+    (sections, sectionFilter, keywordFilter) => filterSections(
+      sections,
+      {
+        section: sectionFilter,
+        keyword: keywordFilter,
+      },
+    ),
   ),
-), 10)
-
-export const selectFilteredSections = (course: Course, filters: CourseFilter) => (
-  selectFilteredSectionsBase(course.code, course, filters)
+  (course) => course.code,
+  10,
 )
 
 export const selectCourseFilter = (

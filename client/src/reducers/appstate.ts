@@ -7,7 +7,7 @@ import {
 } from '../models'
 import { selectCourseFilter } from '../selectors'
 
-export const verifyState = (
+const verifyState = (
   state: AppState,
   ref?: PresetInfo,
 ) => {

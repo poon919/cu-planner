@@ -129,12 +129,14 @@ const App = () => {
       return
     }
 
-    db.setLastPresetID(id)
-    setAppState({
+    const defaultState = {
       preset,
       viewCourseCode: '',
       courseData: {},
-    })
+    }
+
+    db.setLastPresetID(id)
+    setAppState(defaultState)
     closeDialog()
   }
 
@@ -231,7 +233,7 @@ const App = () => {
       return
     }
     const preset = await db.addPresetCourse(presetInfo.id, code, filter)
-    setAppState((state) => state && { ...state, preset })
+    setAppState((state) => rd.setPreset(state, preset))
   }, [presetInfo])
 
   const handleRefreshAll = () => {

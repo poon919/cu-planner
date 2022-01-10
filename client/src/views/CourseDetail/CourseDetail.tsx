@@ -11,7 +11,7 @@ import CourseFilterForm, { useForm } from '../../components/forms/CourseFilterFo
 import LargeAlert from '../../components/LargeAlert'
 import SectionTable from '../../components/SectionTable'
 import CourseTitle from './Title'
-import CourseDescription, { CourseDescriptionSkeleton } from './Description'
+import CourseDescription from './Description'
 import ExamConflicts from './Conflicts'
 import { CourseDetailProps } from './interfaces'
 
@@ -124,7 +124,7 @@ export const CourseDetail = ({
   } else if (result?.type === 'fetching') {
     children = (
       <>
-        <CourseDescriptionSkeleton item container spacing={1} className={classes.details} />
+        <CourseDescription loading item container className={classes.details} />
         <Skeleton component={Grid} item variant="rect" className={classes.tableSkeleton} />
       </>
     )

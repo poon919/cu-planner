@@ -98,31 +98,31 @@ const findGroup = (groups: SectionGroup[], code: string, day: string, time: RegT
   return match
 }
 
-const groupSectionByTimeBase = createSelectorMappingMemo(() => createSelector(
-  (course: Course) => course.code,
-  (course: Course, filter: CourseFilter) => selectFilteredSections(course, filter),
-  (code, sections) => sections
-    .reduce((acc, sec) => {
-      if (sec.isOpen) {
-        const secNo = Number(sec.no)
-        mergeTimetables(sec.timetables).forEach((tt) => {
-          tt.days.forEach((day) => {
-            const { secSpans } = findGroup(acc, code, day, tt.time)
-            if (secSpans.length > 0) {
-              const lastSecSpan = secSpans[secSpans.length - 1]
-              if (lastSecSpan[1] + 1 === secNo) {
-                lastSecSpan[1] = secNo
-                return
+export const groupSectionByTime = createSelectorMappingMemo(
+  () => createSelector(
+    (course: Course) => course.code,
+    (course: Course, filter: CourseFilter) => selectFilteredSections(course, filter),
+    (code, sections) => sections
+      .reduce((acc, sec) => {
+        if (sec.isOpen) {
+          const secNo = Number(sec.no)
+          mergeTimetables(sec.timetables).forEach((tt) => {
+            tt.days.forEach((day) => {
+              const { secSpans } = findGroup(acc, code, day, tt.time)
+              if (secSpans.length > 0) {
+                const lastSecSpan = secSpans[secSpans.length - 1]
+                if (lastSecSpan[1] + 1 === secNo) {
+                  lastSecSpan[1] = secNo
+                  return
+                }
               }
-            }
-            secSpans.push([secNo, secNo])
+              secSpans.push([secNo, secNo])
+            })
           })
-        })
-      }
-      return acc
-    }, [] as SectionGroup[]),
-), 10)
-
-export const groupSectionByTime = (course: Course, filters: CourseFilter) => groupSectionByTimeBase(
-  course.code, course, filters,
+        }
+        return acc
+      }, [] as SectionGroup[]),
+  ),
+  (course) => course.code,
+  10,
 )
