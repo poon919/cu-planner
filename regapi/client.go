@@ -171,7 +171,7 @@ func (c *RegClient) HasData(program string, acadyear int, semester string) bool 
 // GetCourseList perform a request to get courses from reg.chula.
 //
 // If matching courses are not found, an empty slice will be returned.
-// The results are sorted by its code and any unparsable results will be discarded.
+// The results are sorted by its code. Any unparsable results are discarded.
 func (c *RegClient) GetCourseList(program string, acadyear int, semester, code, shortname string) ([]QueryResult, error) {
 	c.mu.RLock()
 	defer c.mu.RUnlock()
