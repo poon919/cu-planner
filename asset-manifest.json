@@ -1,16 +1,16 @@
 {
   "files": {
-    "main.js": "/cu-planner/static/js/main.45edd312.chunk.js",
+    "main.js": "/cu-planner/static/js/main.3cd5711f.chunk.js",
     "runtime-main.js": "/cu-planner/static/js/runtime-main.fe5e9d3f.js",
-    "static/js/2.cb99f82d.chunk.js": "/cu-planner/static/js/2.cb99f82d.chunk.js",
+    "static/js/2.7b72c32a.chunk.js": "/cu-planner/static/js/2.7b72c32a.chunk.js",
     "index.html": "/cu-planner/index.html",
-    "precache-manifest.6a15867166ed1687931a0517e08231f4.js": "/cu-planner/precache-manifest.6a15867166ed1687931a0517e08231f4.js",
+    "precache-manifest.4ee5837a026720c55c87dc97272a2ae6.js": "/cu-planner/precache-manifest.4ee5837a026720c55c87dc97272a2ae6.js",
     "service-worker.js": "/cu-planner/service-worker.js",
-    "static/js/2.cb99f82d.chunk.js.LICENSE.txt": "/cu-planner/static/js/2.cb99f82d.chunk.js.LICENSE.txt"
+    "static/js/2.7b72c32a.chunk.js.LICENSE.txt": "/cu-planner/static/js/2.7b72c32a.chunk.js.LICENSE.txt"
   },
   "entrypoints": [
     "static/js/runtime-main.fe5e9d3f.js",
-    "static/js/2.cb99f82d.chunk.js",
-    "static/js/main.45edd312.chunk.js"
+    "static/js/2.7b72c32a.chunk.js",
+    "static/js/main.3cd5711f.chunk.js"
   ]
 }
