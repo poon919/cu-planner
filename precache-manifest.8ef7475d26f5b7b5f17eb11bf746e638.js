@@ -1,6 +1,6 @@
 self.__precacheManifest = (self.__precacheManifest || []).concat([
   {
-    "revision": "8758a2e0e39280edf149e268119dd9fd",
+    "revision": "0822a1008056f18758d5be321e119721",
     "url": "/cu-planner/index.html"
   },
   {
@@ -12,8 +12,8 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/cu-planner/static/js/2.7b72c32a.chunk.js.LICENSE.txt"
   },
   {
-    "revision": "03c10d456fa0d0e4121d",
-    "url": "/cu-planner/static/js/main.3cd5711f.chunk.js"
+    "revision": "6204eeb315baf05f9dc6",
+    "url": "/cu-planner/static/js/main.ea7f8662.chunk.js"
   },
   {
     "revision": "7a206d98b8d439f88246",
