@@ -14,7 +14,7 @@
 importScripts("https://storage.googleapis.com/workbox-cdn/releases/4.3.1/workbox-sw.js");
 
 importScripts(
-  "/cu-planner/precache-manifest.e09f2e4fab8d0fb1dd2615eb9d7a49af.js"
+  "/cu-planner/precache-manifest.6a15867166ed1687931a0517e08231f4.js"
 );
 
 self.addEventListener('message', (event) => {
