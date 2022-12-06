@@ -21,19 +21,24 @@ https://poon919.github.io/cu-planner
 
 ## Project Structure
 
-#### `client/`
+`client/`
+
 A web application powered by React.js.
 
-#### `regapi/`
+`regapi/`
+
 A Go interface to scrape course data from Chula websites.
 
-#### `scripts/`
+`scripts/`
+
 Automation scripts for building client and server.
 
-#### `server/` and `main.go`
+`server/` and `main.go`
+
 Files for a web server designed to run on Heroku free tier with an optional `Redis` storage.
 
 All user data are stored in a client-side web browser to minimize server costs.
 
-#### `testdata/`
+`testdata/`
+
 HTML files for testing the parsers.
